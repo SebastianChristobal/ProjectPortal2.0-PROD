@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "16.17.1",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.9.1"
+    },
+    "version": "1.17.2",
+    "libraryName": "project-portal",
+    "libraryId": "9ff7d5b7-688e-46c2-a74c-e014ec323847",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "Project-portal",
+    "solutionShortDescription": "Project-portal description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

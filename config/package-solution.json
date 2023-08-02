@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "project-portal-client-side-solution",
+    "id": "9ff7d5b7-688e-46c2-a74c-e014ec323847",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.17.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "Project-portal description"
+      },
+      "longDescription": {
+        "default": "Project-portal description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "project-portal Feature",
+        "description": "The feature that activates elements of the project-portal solution.",
+        "id": "d9802d0a-e24e-4f66-94c4-27351ac52c54",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/project-portal.sppkg"
+  }
+}
