@@ -129,7 +129,7 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
                 text="Skapa projekt"
                 />
                 <DefaultButton
-                text="Avbryt"
+                text="test"
                 />
              </div>
     </React.Fragment>)
