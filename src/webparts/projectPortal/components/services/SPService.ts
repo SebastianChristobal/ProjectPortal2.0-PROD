@@ -1,4 +1,5 @@
 
+
 const LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('ProjektTyp')/items`;
 
 export  const fetchProjectTypes = async (absoluteSiteUrl: string):Promise<any>  =>{
@@ -14,7 +15,7 @@ export  const fetchProjectTypes = async (absoluteSiteUrl: string):Promise<any>  
                    throw new Error('Network response was not ok');
                  }
                  const data = await rawResponse.json().then((response: { value: any[]}) =>{
-                 console.log(response.value);
+                  //console.log(response.value);
                    return response.value;
                  });
                     

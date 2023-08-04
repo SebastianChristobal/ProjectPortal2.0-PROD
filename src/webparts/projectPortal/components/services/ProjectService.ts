@@ -1,47 +1,125 @@
-// import {
-//     SPHttpClient, 
-//     SPHttpClientResponse,
-//     ISPHttpClientOptions, 
-//    } from '@microsoft/sp-http';
-// //import { IDropDownOption } from '../Models';
-// const LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Projekt')`;
+import {
+    SPHttpClient, 
+    SPHttpClientResponse,
+    ISPHttpClientOptions, 
+   } from '@microsoft/sp-http';
+import { IOptions, IProject } from '../Models';
+const PROJECT_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Projekt')`;
+const PROJECTTYPE_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('ProjektTyp')`;
 
 
-//    export class ProjectService {
-//     private _spHttpOptions: any = {
-//         getNoMetaData: <ISPHttpClientOptions>{
-//             headers: {
-//             'ACCEPT': 'application/json; odata.metadata=none'}},
-//         getMetaData: <ISPHttpClientOptions>{
-//             headers: {
-//             'ACCEPT': 'application/json'}},
-//         postNoMetadata: <ISPHttpClientOptions>{ 
-//             headers: {
-//             'ACCEPT': 'application/json; odata.metadata=none',
-//             'CONTENT-TYPE': 'application/json'}},
-//         updateNoMetadata: <ISPHttpClientOptions>{
-//             headers: {
-//             'ACCEPT': 'application/json; odata.metadata=none',
-//             'CONTENT-TYPE': 'application/json',
-//             'X-HTTP-Method': 'PATCH'
-//             }
-//         }
-//     };  
-//     constructor(private siteUrl: string, private client: SPHttpClient) {
-//     }
-//     // public getdropDownOptions():Promise<IDropDownOption[]>{ 
-//     //     const promise: Promise<IDropDownOption[]> = new Promise<IDropDownOption[]>((resolve, reject)=>{     
-//     //         const selectQuery = `Projekttyp`;    
-//     //         this.client.get(`${this.siteUrl}${LIST_API_ENDPOINT}/fields?$filter=EntityPropertyName eq '${selectQuery}'`,
-//     //         SPHttpClient.configurations.v1,
-//     //         this._spHttpOptions.getMetaData
-//     //         ).then((respone: SPHttpClientResponse): Promise<{value: IDropDownOption[]}> =>{
-//     //         return respone.json();}).then((response: { value: IDropDownOption[]}) =>{
-//     //             console.log(response.value);
-//     //         resolve(response.value);    
-//     //         }).catch((error) =>{reject(error);
-//     //       });
-//     //     });
-//     //     return promise;
-//     // }
-// }
+   export class ProjectService {
+
+    private _siteUrl: string;
+    private _spHttpOptions: any = {
+        getMetaData: <ISPHttpClientOptions>{
+            headers: {
+                'ACCEPT': 'application/json; odata.metadata=full'
+            }
+        },
+        getNoMetaData: <ISPHttpClientOptions>{
+            headers: {
+                'ACCEPT': 'application/json; odata.metadata=none'
+            }
+        },
+        updateNoMetaData: <ISPHttpClientOptions>{
+            headers: {
+                'ACCEPT': 'application/json; odata.metadata=none',
+                'CONTENT-TYPE': 'application/json',
+                'X-HTTP-METHOD': 'MERGE'
+            }
+        },
+        postVerboseMetaData: <ISPHttpClientOptions>{
+            headers: {
+                'Accept': 'application/json;odata=verbose',
+                'Content-type': 'application/json;odata=verbose'
+            }
+        },
+        postNoMetaData: <ISPHttpClientOptions>{
+            headers: {
+                'ACCEPT': 'application/json;odata.metadata=none',
+                'CONTENT-TYPE': 'application/json',
+            }
+        }
+    };
+
+    constructor(private siteUrl: string, private client: SPHttpClient) {
+    this._siteUrl = this.siteUrl; 
+    }
+
+    public getMyProject(): Promise<any>{
+        const promise: Promise<any> = new Promise<any>((resolve, reject)=>{
+            this.client.get(`${this.siteUrl}${PROJECT_LIST_API_ENDPOINT}/items`,
+            // this.client.get(`https://karriarkonsulten.sharepoint.com/${LIST_API_ENDPOINT}/items?$select=Kontor`,
+            SPHttpClient.configurations.v1,
+            this._spHttpOptions.getMetaData).then((respone: SPHttpClientResponse): Promise<any> =>{
+            return respone.json();
+            }).then((item: any) =>{
+            resolve(item.value);
+            }).catch((error) =>{
+            reject(error);
+            });
+        }); 
+        return promise;
+    }
+    public getProjectTypeOptions():Promise<IOptions[]>{ 
+        const promise: Promise<IOptions[]> = new Promise<IOptions[]>((resolve, reject)=>{       
+            const selectQuery = '?$select=Title,Id';
+            this.client.get(`${this._siteUrl}${PROJECTTYPE_LIST_API_ENDPOINT}/items${selectQuery}`,
+            SPHttpClient.configurations.v1,
+            this._spHttpOptions.getMetaData
+            ).then((respone: SPHttpClientResponse): Promise<{value: IOptions[]}> =>{
+            return respone.json();}).then((response: { value: IOptions[]}) =>{
+                console.log(response.value);
+            resolve(response.value);    
+            }).catch((error) =>{reject(error);
+          });
+        });
+        return promise;
+    }
+
+
+    private getItemEntityType(): Promise<string> {
+        const promise: Promise<string> = new Promise<string>((resolve, reject) => {
+            this.client.get(`${this._siteUrl}${PROJECT_LIST_API_ENDPOINT}?$select=ListItemEntityTypeFullName`,
+                SPHttpClient.configurations.v1,
+                this._spHttpOptions.getNoMetaData
+            )
+                .then((response: SPHttpClientResponse): Promise<{ ListItemEntityTypeFullName: string }> => {
+                    return response.json();
+                })
+                .then((response: { ListItemEntityTypeFullName: string }): void => {
+                    resolve(response.ListItemEntityTypeFullName);
+                })
+                .catch((error: any) => {
+                    reject(error);
+                });
+        });
+        return promise;
+    }
+
+    public async createProject(newItem: any): Promise<IProject>{
+        console.log(newItem);
+        const oDataType = await this.getItemEntityType();
+        const promise: Promise<IProject> = new Promise<IProject>((resolve, reject) => {
+            const requestDetails: any = this._spHttpOptions.postNoMetaData;
+            newItem['@odata.type'] = oDataType;
+            const queryUrl: string = `${this._siteUrl}${PROJECT_LIST_API_ENDPOINT}/items`;
+            requestDetails.body = JSON.stringify(
+                newItem
+            );
+            this.client.post(
+                queryUrl,
+                SPHttpClient.configurations.v1,
+                requestDetails
+            ).then((response: SPHttpClientResponse): Promise<{value: IProject}> => {
+                return response.json();
+            }).then((response: { value: IProject}) => {
+                    resolve(response.value);
+                }).catch((e) => {
+                    reject(e);
+                });
+        });
+        return promise;
+    }
+}

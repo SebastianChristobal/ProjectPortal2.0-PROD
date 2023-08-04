@@ -9,10 +9,31 @@
     font-family: $ms-font-family-fallbacks;
   }
 }
+.NavigationWrapper{
+  background-color: none;
+}
 .welcome {
   text-align: center;
 }
-
+.startPageWrapper{
+  padding-top: 40px;
+}
+.myProjectsCol{
+  background-color: cadetblue;
+  @include ms-Grid-col;
+  @include ms-lg4;
+  @include ms-xl4;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+}
+.myActivitiesCol{
+  background-color: aquamarine;
+  @include ms-Grid-col;
+  @include ms-lg7;
+  @include ms-xl7;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+}
 .welcomeImage {
   width: 100%;
   max-width: 420px;

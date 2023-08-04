@@ -1,5 +1,6 @@
 import { SPHttpClient } from "@microsoft/sp-http";
 
+
 export interface IProjectPortalProps {
   description: string;
   isDarkTheme: boolean;
@@ -9,4 +10,5 @@ export interface IProjectPortalProps {
   siteAbsolutetUrl: string;
   SPHttpClient: SPHttpClient;
   context:any;
+
 }

@@ -15,62 +15,89 @@ import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import "@pnp/sp/items/get-all";
+import "@pnp/sp/webs";
+import "@pnp/sp/site-users/web";
+import "@pnp/sp/profiles";  
+import { spfi, SPFx } from "@pnp/sp";
 import {INewProjectProps} from './INewProjectProps';
 import { TextField } from '@fluentui/react/lib/TextField';
-import {fetchProjectTypes} from '../services/SPService'
-import { IOptions } from "../Models";
-import { PrimaryButton, DefaultButton } from "office-ui-fabric-react";
 //import { IOptions } from "../Models";
+import { PrimaryButton, DefaultButton } from "office-ui-fabric-react";
 import styles from "../ProjectPortal.module.scss";
+import { ProjectService } from '../services/';
+import { IProject, IUser } from "../Models";
 
 const NewProject: React.FC<INewProjectProps> = (props) =>{
-
-    const [titleValue, setTitleValue] = useState<string>('');
-    const [optValue, setOptValue] = useState<string>('');
+    const _projectService = new ProjectService(props.siteAbsolutetUrl, props.SPHttpClient);
+    const sp = spfi().using(SPFx(props.context));
+    
+    const [titleValue, setTitleValue] = useState<string>('');   
+    const [customerValue, setCustomerValue] = useState<string>('');  
+    const [optValue, setOptValue] = useState<any>(null);
     const [dropdownOptions, setDropdownOptions] = useState<IDropdownOption[]>([]);
     const [projectManager, setProjectManager] = useState([]);
     const [responsibleManager, setResponsibleManager] = useState([]);
     const [projectMembers, setprojectMembers] = useState([]);
     
-    const _getProjectManager = (items: any[]): void => {
-        setProjectManager(items);
-    }
-    const _getResponsibleManager = (items: any[]): void => {
-        setResponsibleManager(items);
-    }
-    const _getProjectMembers = (items: any[]): void => {
-        setprojectMembers(items);
-    }
+    const _getProjectManager = (props: IUser[]): void => {  setProjectManager(props);}
+    const _getResponsibleManager = (props: IUser[]): void => {  setResponsibleManager(props);}
+    const _getProjectMembers = (props: IUser[]): void => {  setprojectMembers(props);}
+    
     const _onOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
-        setOptValue(option.text);
+        setOptValue(option.key);
     }
-    const onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
+    const _onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
         setTitleValue(newValue);
     }
+    const _onCustomerTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
+        setCustomerValue(newValue);
+    }
 
+    const onSaveProject = async (): Promise<any>  => {
+        const projectManagerUser = projectManager.map((items: IUser) =>{return items.id})[0];
+        const responsibleManagerUser = responsibleManager.map((items: IUser) =>{return items.id})[0];
+        const projectMembersUser: number[] = [];
+        projectMembers.map( async (items: IUser) => {
+            const selectedProjectManager = await sp.web.ensureUser(items.id);
+            projectMembersUser.push(selectedProjectManager.data.Id); // Push the Id into the array
+        });
+        const selectedProjectManager = await sp.web.ensureUser(projectManagerUser);
+        const selectedResponsibleManager = await sp.web.ensureUser(responsibleManagerUser);
+       
+        const project: IProject = {
+            Title: titleValue,
+            Customer: customerValue,
+            ProjectTypeId: optValue,
+            ProjectLeaderId: selectedProjectManager.data.Id,
+            ProjectManagerId: selectedResponsibleManager.data.Id,
+            ProjectMembersId: projectMembersUser
+        }
+        try{
+             await _projectService.createProject(project).then(() => {console.log('success');});
+            }
+        catch(error){
+            console.error(error);
+            }
+    }
     useEffect(() => {
-        fetchProjectTypes(props.siteAbsolutetUrl).then((data: IOptions[]) => {
-            const dropDownOptions = data.map(x => ({
-                key: x.Id,
-                text: x.Title
-              }));
-            setDropdownOptions(dropDownOptions);
-          })
-          .catch((error) => {
-            console.error('Error while fetching data:', error);
-          });
-    },[]);
-    useEffect(() =>{
-        setTitleValue(props.context.pageContext.user.displayName);
-    });
-  
+        const fetchData = async (): Promise<any> => {
+            try {
+                const items = await sp.web.lists.getByTitle("ProjektTyp").items();
+                const dropdownOptions = items.map((option: any) => ({
+                    key: option.Id,
+                    text: option.Title
+                }));
+                setDropdownOptions(dropdownOptions);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+        };
 
-    console.log(titleValue);    
-    console.log(dropdownOptions);   
-    console.log(projectManager);
-    console.log(responsibleManager);
-    console.log(projectMembers);
-    console.log(optValue);
+        fetchData().catch((err) => {
+            console.error(err);
+        });
+    }, []); 
 
     return (
     <React.Fragment>
@@ -78,13 +105,18 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
             label="Rubrik"
             // errorMessage="Error message" 
             required={true}
-            onChange={ onTitleTextFieldChange }
+            onChange={ _onTitleTextFieldChange }
+             />
+             <TextField 
+               label="Kund"
+               required={true}
+               onChange={ _onCustomerTextFieldChange } 
              />
                <Dropdown
                  placeholder="välj projekttyp"
                 label="Projekttyp"
                 options={ dropdownOptions }
-                onChange={_onOptionsChange}
+                onChange={ _onOptionsChange }
                 required={true}
                // onChange={dropdownOpt}
             />
@@ -127,16 +159,13 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
              <div className={styles.buttonWrapper}>
                 <PrimaryButton 
                 text="Skapa projekt"
+                onClick={ onSaveProject}
                 />
                 <DefaultButton
                 text="Avbryt"
                 />
              </div>
     </React.Fragment>)
-
-
-
-
 }
 
 export default NewProject;

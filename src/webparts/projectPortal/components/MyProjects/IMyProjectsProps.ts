@@ -1,7 +1,7 @@
 import { SPHttpClient } from "@microsoft/sp-http";
 
-export interface INewProjectProps{
+export interface IMyProjectsProps {
     SPHttpClient?: SPHttpClient;
     siteAbsolutetUrl?: string;
-    context?: any; 
+    context?: any;
 }
