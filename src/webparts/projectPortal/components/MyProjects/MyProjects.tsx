@@ -44,7 +44,6 @@ const MyProject: React.FC<IMyProjectsProps> = (props) =>{
                 console.error(error);
          }
         };
-
         fetchData().catch((err) => {
             console.error(err);
         });

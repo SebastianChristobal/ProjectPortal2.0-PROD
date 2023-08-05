@@ -10,6 +10,13 @@
   }
 }
 .NavigationWrapper{
+  @include ms-Grid-col;
+  @include ms-lg10;
+  @include ms-xl10;
+  @include ms-sm12;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+  padding-top: 30px;
   background-color: none;
 }
 .welcome {
@@ -18,6 +25,52 @@
 .startPageWrapper{
   padding-top: 40px;
 }
+.newProjectTopNav{
+@include ms-Grid-col;
+  @include ms-lg10;
+  @include ms-xl10;
+  @include ms-sm12;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+  height: auto;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 5px 0px;
+  padding: 30px 30px 30px 30px;
+  background-color: #e7e7e7;
+}
+.portalImage{
+  @include ms-Grid-col;
+  @include ms-lg10;
+  @include ms-xl10;
+  @include ms-sm12;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+  width: 100%;
+  background-color: aliceblue;
+}
+.newProjectForm{
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 5px 0px;
+  @include ms-Grid-col;
+  @include ms-lg6;
+  @include ms-xl6;
+  @include ms-sm12;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+  padding: 30px 30px 30px 30px;
+  margin-top: 40px
+}
+.newProjectWrapper{
+  @include ms-Grid-col;
+  @include ms-lg12;
+  @include ms-xl12;
+  @include ms-sm12;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+  width: 100;
+  height: auto;
+  position: static;
+  padding-top: 30px;
+}
+
 .myProjectsCol{
   background-color: cadetblue;
   @include ms-Grid-col;
@@ -29,10 +82,25 @@
 .myActivitiesCol{
   background-color: aquamarine;
   @include ms-Grid-col;
-  @include ms-lg7;
-  @include ms-xl7;
+  @include ms-lg6;
+  @include ms-xl6;
   @include ms-xlPush2;
   @include ms-lgPush1;
+}
+.newProjectHeaderText{
+  font-size: 18;
+  font-weight: 400;
+}
+.newProjectInfoText{
+  @include ms-Grid-col;
+  @include ms-lg4;
+  @include ms-xl4;
+  @include ms-sm12;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+  font-size: 18;
+  font-weight: 400;
+  padding: 30px 30px 30px 30px;
 }
 .welcomeImage {
   width: 100%;

@@ -22,7 +22,7 @@ import { spfi, SPFx } from "@pnp/sp";
 import {INewProjectProps} from './INewProjectProps';
 import { TextField } from '@fluentui/react/lib/TextField';
 //import { IOptions } from "../Models";
-import { PrimaryButton, DefaultButton } from "office-ui-fabric-react";
+import { PrimaryButton, DefaultButton, Label } from "office-ui-fabric-react";
 import styles from "../ProjectPortal.module.scss";
 import { ProjectService } from '../services/';
 import { IProject, IUser } from "../Models";
@@ -101,7 +101,26 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
 
     return (
     <React.Fragment>
-            <TextField 
+    <div className={styles.newProjectWrapper}>
+        <div className={styles.newProjectTopNav}>
+            <div>
+                <Label
+                style={{fontSize:24, fontWeight: 600}}
+                >
+                Registrera ett nytt projekt</Label>
+            </div>
+            <div className={styles.newProjectHeaderText}>
+                <Label
+                style={{fontSize:18, fontWeight: 400}}
+                >
+                Använd formuläret nedan för att registrera ett nytt projekt.
+                När projektregistreringen har godkänts kommer projektet automatiskt registreras 
+                i projektportföljen och ett Microsoft Teams team samt tillhörande SharePoint webbplats skapas upp.
+                Den angivna projektledaren samt projektägaren för projektet kommer få ett mail med information om att projektet är skapat och kommer även läggas in som ägare av teamet.</Label>
+            </div>
+        </div>
+        <div className={styles.newProjectForm}>
+        <TextField 
             label="Rubrik"
             // errorMessage="Error message" 
             required={true}
@@ -165,6 +184,18 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
                 text="Avbryt"
                 />
              </div>
+        </div>
+        <div className={styles.newProjectInfoText}>
+            <Label
+             style={{fontSize:18, fontWeight: 400}}
+            >
+            När ett projekt registreras ombeds du välja Sekretessnivå. Val av sekretessnivå styr behörighet att se projektet i projektportföljen samt behörighetsnivå på SharePoint webbplatsen och teamet som skapas för projektet. 
+            Standard - Alla användare kan se projektet i projektportföljen samt komma åt och läsa allt på SharePoint webbplatsen. Endast projektdeltagare (användare som är tillagda i det aktuella teamet) får tillgång till teamet.
+            Nedlåst - Projektet är synligt för alla användare i projektportföljen men inga, förutom projektdeltagare (ägare och medlemmar i teamet) kommer åt SharePoint webbplatsen samt har tillgång till teamet.
+            Konfidentiellt - Projektet är dolt för alla användare i projektportföljen (syns endast för medlemmar i SharePoint gruppen "Konfidentiella projekt"), projektdeltagare (användare som läggs till i teamet) kommer åt teamet och SharePoint webbplatsen.
+            </Label>
+        </div>
+    </div>
     </React.Fragment>)
 }
 

@@ -14,6 +14,7 @@ import {
     PivotLinkFormat, 
     PivotLinkSize
 } from  'office-ui-fabric-react';
+import { Image, IImageProps } from '@fluentui/react/lib/Image';
 import NewProject from './NewProject/NewProject';
 import Start from './Start/Start';
 //import { initializeIcons } from '@uifabric/icons';
@@ -23,27 +24,35 @@ import Start from './Start/Start';
 
 const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps) =>{
   const {SPHttpClient, context, siteAbsolutetUrl} = props;
-
+  const imageProps: Partial<IImageProps> = {
+    src: 'https://braverodev.sharepoint.com/sites/Projektportalen2.0/StartPageImage/projectPortalImage.png',
+    // Show a border around the image (just for demonstration purposes)
+    styles: props => ({ root: { border: '1px solid ' + props.theme.palette.neutralSecondary } }),
+  };
+  
   const handleLinkClick = (item: PivotItem):void =>{
-    if(item.props.headerText === 'Start'){
+    if(item.props.itemKey === 'Start'){
       window.open(`#/`, "_self");
     }
-    if(item.props.headerText === 'Registrera nytt projekt'){
-      window.open(`#/newProject`, "_self");
+    if(item.props.itemKey === 'registerNewProject'){
+      window.open(`#/nyttProjekt`, "_self");
     }
-    if(item.props.headerText === 'Visa alla projekt'){
-      window.open(`#/allProjects`, "_self");
+    if(item.props.itemKey === 'showAllProjects'){
+      window.open(`#/allaProjekt`, "_self");
     }
-    if(item.props.headerText === 'Registrera ÄTA'){
-      window.open(`#/registerATA`, "_self");
+    if(item.props.itemKey === 'registerATA'){
+      window.open(`#/registreraATA`, "_self");
     }
-    if(item.props.headerText === 'Registrera genomförd kontroll'){
-      window.open(`#/RegisterCompletedControl`, "_self");
+    if(item.props.itemKey === 'RegisterCompletedControl'){
+      window.open(`#/registreraKontroll`, "_self");
     }
   }
 
   return(
   <div className={styles.projectPortal}>
+    <div className={styles.portalImage}>
+    <Image {...imageProps} style={{ width :'100%', height: 'auto'}} alt="Example with no image fit value and no height or width is specified." />
+    </div>
       <div className={styles.NavigationWrapper}>
       <Pivot 
           defaultSelectedKey={"0"}
@@ -63,19 +72,19 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
              />
              <PivotItem 
              headerText="Registrera nytt projekt"        
-             itemKey="Registrera nytt projekt"
+             itemKey="registerNewProject"
              />
              <PivotItem 
              headerText="Visa alla projekt"    
-             itemKey="Visa alla projekt"
+             itemKey="showAllProjects"
              />
              <PivotItem 
              headerText="Registrera ÄTA"        
-             itemKey="Registrera ÄTA"
+             itemKey="registerATA"
              />
             <PivotItem 
              headerText="Registrera genomförd kontroll"        
-             itemKey="Registrera genomförd kontroll"
+             itemKey="RegisterCompletedControl"
              />
       </Pivot>
       </div>
@@ -83,7 +92,7 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
       <Route exact path={'/'} render={(props: any) =>
           <Start {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
-      <Route path={'/newProject/'} render={(props: any) =>
+      <Route path={'/nyttProjekt/'} render={(props: any) =>
           <NewProject {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
     </HashRouter>
