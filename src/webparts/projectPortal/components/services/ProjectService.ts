@@ -43,13 +43,14 @@ const PROJECTTYPE_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Proje
         }
     };
 
-    constructor(private siteUrl: string, private client: SPHttpClient) {
-    this._siteUrl = this.siteUrl; 
+    constructor(private siteAbsolutetUrl: string, private client: SPHttpClient) {
+    this._siteUrl = this.siteAbsolutetUrl; 
+    console.log(this._siteUrl);
     }
 
     public getMyProject(): Promise<any>{
         const promise: Promise<any> = new Promise<any>((resolve, reject)=>{
-            this.client.get(`${this.siteUrl}${PROJECT_LIST_API_ENDPOINT}/items`,
+            this.client.get(`${this._siteUrl}${PROJECT_LIST_API_ENDPOINT}/items`,
             // this.client.get(`https://karriarkonsulten.sharepoint.com/${LIST_API_ENDPOINT}/items?$select=Kontor`,
             SPHttpClient.configurations.v1,
             this._spHttpOptions.getMetaData).then((respone: SPHttpClientResponse): Promise<any> =>{
@@ -99,7 +100,6 @@ const PROJECTTYPE_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Proje
     }
 
     public async createProject(newItem: any): Promise<IProject>{
-        console.log(newItem);
         const oDataType = await this.getItemEntityType();
         const promise: Promise<IProject> = new Promise<IProject>((resolve, reject) => {
             const requestDetails: any = this._spHttpOptions.postNoMetaData;

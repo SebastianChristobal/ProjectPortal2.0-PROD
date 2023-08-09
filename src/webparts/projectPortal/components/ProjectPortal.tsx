@@ -25,7 +25,7 @@ import Start from './Start/Start';
 const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps) =>{
   const {SPHttpClient, context, siteAbsolutetUrl} = props;
   const imageProps: Partial<IImageProps> = {
-    src: 'https://braverodev.sharepoint.com/sites/Projektportalen2.0/StartPageImage/projectPortalImage.png',
+    src: 'https://braverodev.sharepoint.com/sites/Projektportalen2.0/StartPageImage/portalImg.png',
     // Show a border around the image (just for demonstration purposes)
     styles: props => ({ root: { border: '1px solid ' + props.theme.palette.neutralSecondary } }),
   };

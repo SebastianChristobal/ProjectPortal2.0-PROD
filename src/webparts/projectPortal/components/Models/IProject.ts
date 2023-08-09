@@ -11,4 +11,5 @@ export interface IProject{
     ProjectMembers?:string;
     ProjectNumberId?: number;
     Customer?: string;
+    ProjectImage?: string;
 }

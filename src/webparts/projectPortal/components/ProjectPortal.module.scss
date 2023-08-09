@@ -23,7 +23,16 @@
   text-align: center;
 }
 .startPageWrapper{
-  padding-top: 40px;
+  @include ms-Grid-col;
+  @include ms-lg12;
+  @include ms-xl12;
+  @include ms-sm12;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+  width: 100;
+  height: auto;
+  position: inherit;
+  padding: 30px 30px 30px 30px;
 }
 .newProjectTopNav{
 @include ms-Grid-col;
@@ -34,18 +43,18 @@
   @include ms-lgPush1;
   height: auto;
   box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 5px 0px;
-  padding: 30px 30px 30px 30px;
+  padding: 20px 20px 20px 20px;
   background-color: #e7e7e7;
 }
 .portalImage{
   @include ms-Grid-col;
-  @include ms-lg10;
-  @include ms-xl10;
+  @include ms-lg12;
+  @include ms-xl12;
   @include ms-sm12;
   @include ms-xlPush2;
   @include ms-lgPush1;
   width: 100%;
-  background-color: aliceblue;
+  position: initial;
 }
 .newProjectForm{
   box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 5px 0px;
@@ -70,22 +79,32 @@
   position: static;
   padding-top: 30px;
 }
-
-.myProjectsCol{
-  background-color: cadetblue;
-  @include ms-Grid-col;
-  @include ms-lg4;
-  @include ms-xl4;
-  @include ms-xlPush2;
-  @include ms-lgPush1;
+.myProjects{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  width: 100%;
 }
-.myActivitiesCol{
-  background-color: aquamarine;
+.projectActivityWrapper{
+  padding: 1px 1px 1px 1px;
+}
+.myProjectsColumn{
   @include ms-Grid-col;
-  @include ms-lg6;
-  @include ms-xl6;
+  @include ms-lg2;
+  @include ms-xl2;
+  @include ms-sm12;
   @include ms-xlPush2;
   @include ms-lgPush1;
+  margin-top: 40px;
+}
+.myActivitiesColumn{
+  @include ms-Grid-col;
+  @include ms-lg8;
+  @include ms-xl8;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+  margin-top: 40px
 }
 .newProjectHeaderText{
   font-size: 18;
@@ -106,9 +125,13 @@
   width: 100%;
   max-width: 420px;
 }
+.imageWrapper{
+ background-color: #e7e7e7;
+}
 .buttonWrapper{
   padding-top: 10px;
 }
+
 .links {
   a {
     text-decoration: none;

@@ -18,17 +18,16 @@ import "@pnp/sp/items/get-all";
 import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";  
+import { IItemAddResult } from "@pnp/sp/items";
 import { spfi, SPFx } from "@pnp/sp";
 import {INewProjectProps} from './INewProjectProps';
 import { TextField } from '@fluentui/react/lib/TextField';
 //import { IOptions } from "../Models";
 import { PrimaryButton, DefaultButton, Label } from "office-ui-fabric-react";
 import styles from "../ProjectPortal.module.scss";
-import { ProjectService } from '../services/';
 import { IProject, IUser } from "../Models";
 
 const NewProject: React.FC<INewProjectProps> = (props) =>{
-    const _projectService = new ProjectService(props.siteAbsolutetUrl, props.SPHttpClient);
     const sp = spfi().using(SPFx(props.context));
     
     const [titleValue, setTitleValue] = useState<string>('');   
@@ -73,11 +72,13 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
             ProjectMembersId: projectMembersUser
         }
         try{
-             await _projectService.createProject(project).then(() => {console.log('success');});
+             const iar: IItemAddResult = await sp.web.lists.getByTitle("Projekt").items.add(project)
+             console.log(iar);
             }
         catch(error){
             console.error(error);
             }
+           
     }
     useEffect(() => {
         const fetchData = async (): Promise<any> => {
