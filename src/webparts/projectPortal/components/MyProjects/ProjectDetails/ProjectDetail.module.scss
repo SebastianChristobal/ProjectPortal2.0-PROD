@@ -1,0 +1,73 @@
+@import '~@fluentui/react/dist/sass/References.scss';
+
+
+.ProjectDetailsPage{
+    @include ms-Grid-col;
+    @include ms-lg12;
+    @include ms-xl12;
+    @include ms-sm12;
+    @include ms-xlPush2;
+    @include ms-lgPush1;
+    padding-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    height: auto;
+    position: inherit;
+  }
+.projectDetailsAndFasWrapper{
+    @include ms-Grid-col;
+    @include ms-lg7;
+    @include ms-xl7;
+    @include ms-sm12;
+    @include ms-xlPush2;
+    @include ms-lgPush1;
+    height: 300px;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+.projectDetailsWrapper{
+    @include ms-Grid-row;
+    @include ms-lg12;
+    @include ms-xl12;
+    @include ms-sm12;
+    @include ms-xlPush2;
+    @include ms-lgPush1;
+    height: 150px;
+    margin: auto;
+
+    background-color: rgb(116, 138, 138);
+}
+.projectFasWrapper{
+    @include ms-Grid-row;
+    @include ms-lg12;
+    @include ms-xl12;
+    @include ms-sm12;
+    @include ms-xlPush2;
+    @include ms-lgPush1;
+    height: 150px;
+    margin: auto;
+   
+    background-color: rgb(72, 116, 100);
+}
+.projectDetailButtonsWrapper{
+    @include ms-Grid-col;
+    @include ms-lg3;
+    @include ms-xl3;
+    @include ms-sm12;
+    @include ms-xlPush2;
+    @include ms-lgPush1;
+    height: 300px;
+
+    background-color: rgb(138, 116, 134);
+}
+
+.projectListItemsAndDocWrapper{
+    @include ms-Grid-col;
+    @include ms-lg10;
+    @include ms-xl10;
+    @include ms-sm12;
+    @include ms-xlPush2;
+    @include ms-lgPush1;
+    height: 150px;
+    background-color: rgb(93, 72, 116);
+}

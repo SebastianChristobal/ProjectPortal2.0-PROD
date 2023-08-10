@@ -3,7 +3,7 @@ import { IStartProps } from "./IStartProps";
 import { Label } from "office-ui-fabric-react";
 import styles from "../ProjectPortal.module.scss";
 import MyProject from "../MyProjects/MyProjects";
-import MyActivities from "../MyActivities/MyActivities";
+import MyActivities from "../ActivitiesAndControlpoints/ActivitiesAndControlpoints";
 
 const Start : React.FC<IStartProps> = (props: IStartProps) =>{
 

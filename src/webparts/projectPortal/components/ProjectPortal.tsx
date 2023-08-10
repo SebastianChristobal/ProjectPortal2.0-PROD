@@ -17,6 +17,7 @@ import {
 import { Image, IImageProps } from '@fluentui/react/lib/Image';
 import NewProject from './NewProject/NewProject';
 import Start from './Start/Start';
+import ProjectDetail from './MyProjects/ProjectDetails/ProjectDetail';
 //import { initializeIcons } from '@uifabric/icons';
 //import NewProject from './NewProject/NewProject';
 //import NewProject from './NewProject/NewProject';
@@ -94,6 +95,13 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
         } />
       <Route path={'/nyttProjekt/'} render={(props: any) =>
           <NewProject {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
+        } />
+        <Route path={'/Projekt/'} render={(props: any) =>
+
+          <NewProject {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
+        } />
+      <Route path={'/ProjektDetaljer/'} render={(props: any) =>
+        <ProjectDetail {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
     </HashRouter>
    
