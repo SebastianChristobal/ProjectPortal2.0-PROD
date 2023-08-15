@@ -14,6 +14,7 @@ import "@pnp/sp/items/get-all";
 import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";  
+import "@pnp/sp/fields";
  import { IItemAddResult } from "@pnp/sp/items";
  import { spfi, SPFx } from "@pnp/sp";
 // import {INewProjectProps} from './INewProjectProps';
@@ -23,14 +24,13 @@ import {
   PrimaryButton, 
   Label
  } from "office-ui-fabric-react";
-import { INewATAProps } from "./INewATAProps";
-
+import { INewControlPointProps } from "./INewControlPointProps";
+//import { IField, IFieldInfo } from "@pnp/sp/fields/types";
 import styles from "../ProjectPortal.module.scss";
+import { IControlPoints } from "../Models/IControlPoints";
 import { IProject } from "../Models";
-import { IATA } from "../Models/IATA";
 
-
-const NewATA: React.FC<INewATAProps> = (props) =>{
+const NewControlPoint: React.FC<INewControlPointProps> = (props) =>{
   const sp = spfi().using(SPFx(props.context));
 
   const [titleValue, setTitleValue] = useState<string>('');   
@@ -38,10 +38,16 @@ const NewATA: React.FC<INewATAProps> = (props) =>{
   const [extentValue, setExtentValue] = useState<string>('');  
   const [priceValue, setPriceValue] = useState<string>(''); 
   const [optValue, setOptValue] = useState<any>(null);
+  const [optControlTypeValue, setOptControlTypeValue] = useState<any>(null);
   const [dropdownOptions, setDropdownOptions] = useState<IDropdownOption[]>([]);
+  const [controlTypeOptions, setControlTypeOptions] = useState<IDropdownOption[]>([]);
+
 
 const _onOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
-  setOptValue(option.key);
+    setOptValue(option.key);
+}
+const _onControlTypeOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
+    setOptControlTypeValue(option.key);
 }
 const _onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
   setTitleValue(newValue);
@@ -56,16 +62,12 @@ const _onPriceTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLT
   setPriceValue(newValue);
 }
 
-const onSaveATA = async (): Promise<any>  => {
-  const ata: IATA = {
+const onSaveControlPoint = async (): Promise<any>  => {
+  const ata: IControlPoints = {
       Title: titleValue,
-      Customer: customerValue,
-      ProjektId: optValue,
-      Extent: extentValue,
-      Price: priceValue
   }
   try{
-       const iar: IItemAddResult = await sp.web.lists.getByTitle("ATA").items.add(ata)
+       const iar: IItemAddResult = await sp.web.lists.getByTitle("Control").items.add(ata)
        console.log(iar);
       }
   catch(error){
@@ -87,12 +89,41 @@ useEffect(() => {
               console.error(error);
           }
   };
+
   fetchProjectsAsOptions().catch((err) => {
       console.error(err);
   });
 }, []); 
 
+useEffect(() => {
+    const options : IDropdownOption[] = [{ key: 'Kvalitetskontroll', text: 'Kvalitetskontroll'   }, {  key: 'Brandskyddskontroll', text: 'Brandskyddskontroll'}]
+    setControlTypeOptions(options)
+    // const fetchProjectsData = async (): Promise<any> => {
+    //     try {
+    //         const items = await sp.web.lists.getByTitle("Projekt").items();
+    //         const dropdownOptions = items.map((project: IProject) => ({
+    //             key: project.Id,
+    //             text: project.Title
+    //         }));
+    //         setDropdownOptions(dropdownOptions);
+    //         }
+    //         catch (error) {
+    //             console.error(error);
+    //         }
+    // };
+  
+    // fetchProjectsData().catch((err) => {
+    //     console.error(err);
+    // });
+  }, []); 
 
+console.log(optValue);
+console.log(dropdownOptions);
+console.log(titleValue);
+console.log(customerValue);
+console.log(extentValue);
+console.log(priceValue);
+console.log(optControlTypeValue);
 
   return(<React.Fragment>
     <div className={styles.newProjectWrapper}>
@@ -101,51 +132,61 @@ useEffect(() => {
                 <Label
                 style={{fontSize:24, fontWeight: 600}}
                 >
-                Registrera ÄTA (ändring, tillägg och avgående).</Label>
+                Registrera genomförd kontroll.</Label>
             </div>
             <div className={styles.newProjectHeaderText}>
                 <Label
                 style={{fontSize:18, fontWeight: 400}}
                 >
-                Använd formuläret nedan för att registrera en ändring, tillägg och avgående.
+                Använd formuläret nedan för att registrera en genomförd kontrollpunkt.
                 </Label>
             </div>
         </div>
         <div className={styles.newProjectForm}>
-         <Dropdown
-            placeholder="Välj projekt"
-            label="Projekt"
-            options={ dropdownOptions }
-            onChange={ _onOptionsChange }
-            required={true}
-            // onChange={dropdownOpt}
-          />
-          <TextField 
-            label="Rubrik"
-            // errorMessage="Error message" 
-            required={true}
-            onChange={ _onTitleTextFieldChange }
+        <Dropdown
+                 placeholder="Välj projekt"
+                label="Projekt"
+                options={ dropdownOptions }
+                 onChange={ _onOptionsChange }
+                required={true}
+               // onChange={dropdownOpt}
             />
-          <TextField 
-            label="Beställare"
-            required={true}
-            onChange={ _onCustomerTextFieldChange } 
-          />
-          <TextField 
-            label="Omfattning"
-            required={true}
-            onChange={ _onExtentTextFieldChange } 
-          />
-          <TextField 
-            label="Ungefärlig prisuppgift i SEK"
-            required={true}
-            onChange={ _onPriceTextFieldChange } 
-          />
-            <div className={styles.buttonWrapper}>
+            <TextField 
+             label="Rubrik"
+             // errorMessage="Error message" 
+             required={true}
+             onChange={ _onTitleTextFieldChange }
+             />
+               <Dropdown
+                 placeholder="Välj kontrolltyp"
+                label="Kontrolltyp"
+                options={ controlTypeOptions }
+                 onChange={ _onControlTypeOptionsChange }
+                required={true}
+               // onChange={dropdownOpt}
+            />
+             <TextField 
+               label="Beskrivning"
+               required={true}
+               multiline={true}
+               rows={6}
+               onChange={ _onCustomerTextFieldChange }  
+             />
+              <TextField 
+               label="Omfattning"
+               required={true}
+               onChange={ _onExtentTextFieldChange } 
+             />
+              <TextField 
+               label="Ungefärlig prisuppgift i SEK"
+               required={true}
+               onChange={ _onPriceTextFieldChange } 
+             />
+             <div className={styles.buttonWrapper}>
                 <PrimaryButton 
-                text="Skapa ÄTA"
-                disabled={!titleValue || !customerValue || !extentValue || !priceValue || !optValue || !dropdownOptions }
-                onClick={ onSaveATA }
+                disabled={!titleValue || !customerValue || !extentValue || !priceValue || !optValue || !dropdownOptions || !optControlTypeValue }
+                text="Skapa genomförd kontroll"
+                onClick={ onSaveControlPoint}
                 />
              </div>
         </div>
@@ -160,4 +201,6 @@ useEffect(() => {
     </React.Fragment>)
 }
 
-export default NewATA;
+
+
+export default NewControlPoint;

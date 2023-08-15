@@ -42,9 +42,8 @@
   @include ms-xlPush2;
   @include ms-lgPush1;
   height: auto;
-  box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 5px 0px;
-  padding: 20px 20px 20px 20px;
-  background-color: #e7e7e7;
+  padding: 15px 15px 15px 15px;
+  background-color: #c3c3c36e;
 }
 .portalImage{
   @include ms-Grid-col;
@@ -130,6 +129,10 @@
 }
 .buttonWrapper{
   padding-top: 10px;
+  float: right;
+}
+@media (max-width: 1026px) {
+  .NavigationWrapper { display: none; }
 }
 
 .links {

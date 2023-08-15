@@ -14,7 +14,7 @@ import { spfi, SPFx } from "@pnp/sp";
 import {
     DocumentCard,
     DocumentCardDetails,
-    DocumentCardTitle,
+    // DocumentCardTitle,
     DocumentCardImage,
     IDocumentCardStyles,
     // DocumentCardType,
@@ -106,59 +106,58 @@ const MyProject: React.FC<IMyProjectsProps> = (props) =>{
     const renderOnGoingProjects = myProjects.map((project: IProject) =>{
      // const projectimage: any = project.ProjectImage !== '' ? oneNoteIconProps : '';
         return(
-              <Label key={project.Id} >
-                            {project.Status === 'Pågående' &&
-                            <DocumentCard
-                            key={project.Id}
-                            aria-label={
-                              'Document Card with icon. How to make a good design. ' +
-                              'Last modified by Christian Bergqvist in January 1, 2019.'
-                            }
-                            styles={cardStyles}
-                            // onClickHref={`${props.siteAbsolutetUrl}/ProjektDetaljer/${project.Id}`}
-                            onClick={() => onOpenProjectDetails(project) }
-                          >
-                            <div className={styles.imageWrapper}>
-                            <DocumentCardImage height={150}  imageFit={ImageFit.cover} imageSrc={project.ProjectImage}  />
-                            </div>
-                            <DocumentCardDetails  className={styles.documentCardTitle} >
-                              <div>{project.Title}</div>
-                              <div>{project.Customer}</div>
-                            </DocumentCardDetails>
-                            
-                          </DocumentCard>
-                            }
+              <React.Fragment key={project.Id}>
+                {project.Status === 'Pågående' &&
+                <Label key={project.Id} >
+                <DocumentCard
+                key={project.Id}
+                aria-label={
+                  'Document Card with icon. How to make a good design. ' +
+                  'Last modified by Christian Bergqvist in January 1, 2019.'
+                }
+                styles={cardStyles}
+                // onClickHref={`${props.siteAbsolutetUrl}/ProjektDetaljer/${project.Id}`}
+                onClick={() => onOpenProjectDetails(project) }
+              >
+                <div className={styles.imageWrapper}>
+                <DocumentCardImage height={150}  imageFit={ImageFit.cover} imageSrc={project.ProjectImage}  />
+                </div>
+                <DocumentCardDetails  className={styles.documentCardTitle} >
+                  <div>{project.Title}</div>
+                  <div>{project.Customer}</div>
+                </DocumentCardDetails>               
+              </DocumentCard>
               </Label>
+                }
+              </React.Fragment>
       )
     });
 
     const finishedProjects = myProjects.map((project: IProject) =>{
-
-      return (<Label key={project.Id}>
-         {project.Status === 'Avslutad' &&
-                            <DocumentCard
-                            key={project.Id}
-                            aria-label={
-                              'Document Card with icon. How to make a good design. ' +
-                              'Last modified by Christian Bergqvist in January 1, 2019.'
-                            }
-                            styles={cardStyles}
-                            // onClickHref={`${props.siteAbsolutetUrl}/ProjektDetaljer/${project.Id}`}
-                            onClick={() => onOpenProjectDetails(project) }
-                          >
-                            <div className={styles.imageWrapper}>
-                            <DocumentCardImage height={150}  imageFit={ImageFit.cover} imageSrc={project.ProjectImage}  />
-                            </div>
-                            <DocumentCardDetails>
-                              <DocumentCardTitle title={project.Title} shouldTruncate />
-                              <DocumentCardTitle title={project.Customer } />
-                            </DocumentCardDetails>
-                            
-                          </DocumentCard>
-                            }
-      </Label>)
-
-      
+      return (<React.Fragment key={project.Id}>
+        {project.Status === "Avslutad" &&
+        <Label key={project.Id}>
+                           <DocumentCard
+                           key={project.Id}
+                           aria-label={
+                             'Document Card with icon. How to make a good design. ' +
+                             'Last modified by Christian Bergqvist in January 1, 2019.'
+                           }
+                           styles={cardStyles}
+                           // onClickHref={`${props.siteAbsolutetUrl}/ProjektDetaljer/${project.Id}`}
+                           onClick={() => onOpenProjectDetails(project) }
+                         >
+                           <div className={styles.imageWrapper}>
+                           <DocumentCardImage height={150}  imageFit={ImageFit.cover} imageSrc={project.ProjectImage}  />
+                           </div>
+                           <DocumentCardDetails className={styles.documentCardTitle}>
+                           <div>{project.Title}</div>
+                           <div>{project.Customer}</div>
+                           </DocumentCardDetails>                          
+                         </DocumentCard>
+        </Label>
+        }
+      </React.Fragment>)
     });
 
     return(<React.Fragment>
@@ -173,8 +172,8 @@ const MyProject: React.FC<IMyProjectsProps> = (props) =>{
           linkFormat={PivotLinkFormat.tabs}
           linkSize={PivotLinkSize.large}
           styles={{ 
-            link: {borderStyle:'solid', borderWidth:'1px', marginRight:'2px', width:'49%'},
-            linkIsSelected: {borderStyle:'solid', borderWidth:'1px', borderColor:'black', marginRight:'2px', width:'49%'},
+            link: {borderStyle:'solid', borderWidth:'1px', marginRight:'7px', width:'49%'},
+            linkIsSelected: {borderStyle:'solid', borderWidth:'1px', borderColor:'black', marginRight:'7px', width:'49%'},
             linkContent: {padding:'0px 8px 0px 8px'}
             }}
           >
@@ -198,7 +197,6 @@ const MyProject: React.FC<IMyProjectsProps> = (props) =>{
         </div>
     </React.Fragment>);
 }
-
 export default MyProject;
 
 

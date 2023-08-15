@@ -122,7 +122,7 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
                 key: 'column1', name: 'Rubrik', fieldName: 'Title', minWidth: 100, maxWidth: 250, isResizable: true, 
             },
             {
-                key: 'column2', name: 'Projekt', fieldName: 'Projekt', minWidth: 100, maxWidth: 250, isResizable: true, 
+                key: 'column2', name: 'Projekt', fieldName: 'Projekt', minWidth: 100, maxWidth: 250, isResizable: true,  
             },
             {
                 key: 'column3', name: 'Beskrivning', fieldName: 'Description', minWidth: 100, maxWidth: 250, isResizable: true, 

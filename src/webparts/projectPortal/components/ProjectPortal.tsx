@@ -19,6 +19,7 @@ import NewProject from './NewProject/NewProject';
 import Start from './Start/Start';
 import ProjectDetail from './MyProjects/ProjectDetails/ProjectDetail';
 import NewATA from './NewATA/NewATA';
+import NewControlPoint from './NewControlPoint/NewControlPoint';
 //import { initializeIcons } from '@uifabric/icons';
 //import NewProject from './NewProject/NewProject';
 //import NewProject from './NewProject/NewProject';
@@ -46,7 +47,7 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
       window.open(`#/registeraATA`, "_self");
     }
     if(item.props.itemKey === 'RegisterCompletedControl'){
-      window.open(`#/registreraKontroll`, "_self");
+      window.open(`#/registreraKontrollPunkt`, "_self");
     }
     // if(item.props.itemKey === 'registerATA'){
     //   window.open(`#/registerATA`, "_self");
@@ -102,6 +103,9 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
         } />
          <Route path={'/registeraATA/'} render={(props: any) =>
         <NewATA {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
+        } />
+          <Route path={'/registreraKontrollPunkt/'} render={(props: any) =>
+        <NewControlPoint {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
             {/* <Route path={'/allaProjekt/'} render={(props: any) =>
         <NewATA {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />

@@ -18,12 +18,16 @@ import "@pnp/sp/items/get-all";
 import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";  
+
 import { IItemAddResult } from "@pnp/sp/items";
 import { spfi, SPFx } from "@pnp/sp";
 import {INewProjectProps} from './INewProjectProps';
 import { TextField } from '@fluentui/react/lib/TextField';
 //import { IOptions } from "../Models";
-import { PrimaryButton, DefaultButton, Label } from "office-ui-fabric-react";
+import { 
+    PrimaryButton,
+    Label 
+} from "office-ui-fabric-react";
 import styles from "../ProjectPortal.module.scss";
 import { IProject, IUser } from "../Models";
 
@@ -180,9 +184,6 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
                 <PrimaryButton 
                 text="Skapa projekt"
                 onClick={ onSaveProject}
-                />
-                <DefaultButton
-                text="Avbryt"
                 />
              </div>
         </div>
