@@ -18,6 +18,7 @@ import { Image, IImageProps } from '@fluentui/react/lib/Image';
 import NewProject from './NewProject/NewProject';
 import Start from './Start/Start';
 import ProjectDetail from './MyProjects/ProjectDetails/ProjectDetail';
+import NewATA from './NewATA/NewATA';
 //import { initializeIcons } from '@uifabric/icons';
 //import NewProject from './NewProject/NewProject';
 //import NewProject from './NewProject/NewProject';
@@ -42,11 +43,14 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
       window.open(`#/allaProjekt`, "_self");
     }
     if(item.props.itemKey === 'registerATA'){
-      window.open(`#/registreraATA`, "_self");
+      window.open(`#/registeraATA`, "_self");
     }
     if(item.props.itemKey === 'RegisterCompletedControl'){
       window.open(`#/registreraKontroll`, "_self");
     }
+    // if(item.props.itemKey === 'registerATA'){
+    //   window.open(`#/registerATA`, "_self");
+    // }
   }
 
   return(
@@ -62,8 +66,8 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
           onLinkClick={ handleLinkClick }
           style={{textAlign: "center"}}
           styles={{ 
-            link: {borderStyle:'solid', borderWidth:'1px', marginRight:'10px'},
-            linkIsSelected: {borderStyle:'solid', borderWidth:'1px', borderColor:'black', marginRight:'10px'},
+            link: {borderStyle:'solid', borderWidth:'1px',borderRadius: '4px', marginRight:'5px'},
+            linkIsSelected: {borderStyle:'solid',borderRadius: '4px', borderWidth:'1px', borderColor:'black', marginRight:'5px'},
             linkContent: {padding:'0px 8px 0px 8px'}
             }}
           >
@@ -96,11 +100,13 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
       <Route path={'/nyttProjekt/'} render={(props: any) =>
           <NewProject {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
-        <Route path={'/Projekt/'} render={(props: any) =>
-
-          <NewProject {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
+         <Route path={'/registeraATA/'} render={(props: any) =>
+        <NewATA {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
-      <Route path={'/ProjektDetaljer/'} render={(props: any) =>
+            {/* <Route path={'/allaProjekt/'} render={(props: any) =>
+        <NewATA {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
+        } /> */}
+      <Route path={'/ProjektDetaljer/:id'} render={(props: any) =>
         <ProjectDetail {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
     </HashRouter>
@@ -108,8 +114,5 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
     {/* <NewProject {...this.props} /> */}
   </div>);
 }
-
-
-
 
 export default ProjectPortal;

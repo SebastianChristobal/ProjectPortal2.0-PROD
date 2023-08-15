@@ -190,10 +190,7 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
             <Label
              style={{fontSize:18, fontWeight: 400}}
             >
-            När ett projekt registreras ombeds du välja Sekretessnivå. Val av sekretessnivå styr behörighet att se projektet i projektportföljen samt behörighetsnivå på SharePoint webbplatsen och teamet som skapas för projektet. 
-            Standard - Alla användare kan se projektet i projektportföljen samt komma åt och läsa allt på SharePoint webbplatsen. Endast projektdeltagare (användare som är tillagda i det aktuella teamet) får tillgång till teamet.
-            Nedlåst - Projektet är synligt för alla användare i projektportföljen men inga, förutom projektdeltagare (ägare och medlemmar i teamet) kommer åt SharePoint webbplatsen samt har tillgång till teamet.
-            Konfidentiellt - Projektet är dolt för alla användare i projektportföljen (syns endast för medlemmar i SharePoint gruppen "Konfidentiella projekt"), projektdeltagare (användare som läggs till i teamet) kommer åt teamet och SharePoint webbplatsen.
+           Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.
             </Label>
         </div>
     </div>

@@ -3,11 +3,9 @@ import { IStartProps } from "./IStartProps";
 import { Label } from "office-ui-fabric-react";
 import styles from "../ProjectPortal.module.scss";
 import MyProject from "../MyProjects/MyProjects";
-import MyActivities from "../ActivitiesAndControlpoints/ActivitiesAndControlpoints";
+import ActivitiesAndControlpoints from "../ActivitiesAndControlpoints/ActivitiesAndControlpoints";
 
 const Start : React.FC<IStartProps> = (props: IStartProps) =>{
-
-
     return(<React.Fragment>
     <div className={styles.startPageWrapper}>
     <div className={styles.newProjectTopNav}>
@@ -30,7 +28,7 @@ const Start : React.FC<IStartProps> = (props: IStartProps) =>{
             <MyProject {...props} />
         </div>
         <div className={styles.myActivitiesColumn}>
-            <MyActivities {...props} />
+            <ActivitiesAndControlpoints {...props} />
         </div>
         </div>
     </div></React.Fragment>);

@@ -17,16 +17,29 @@ import {
     SelectionMode,
      IColumn 
     } from '@fluentui/react/lib/DetailsList';
-import {
-     Dialog, 
-     DialogType, 
-     DialogFooter 
-    } from '@fluentui/react/lib/Dialog';
+    import {
+        DatePicker,
+        // DatePicker,
+        // Dropdown,
+        // IDropdownOption,
+        // IDropdownStyles,
+        TextField,
+    } from 'office-ui-fabric-react';
+    // import { 
+    //     PeoplePicker, 
+    //     PrincipalType 
+    // } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+import { Panel, PanelType } from '@fluentui/react/lib/Panel';    
 import * as moment from 'moment';
-import {  Label, PrimaryButton,DefaultButton } from "office-ui-fabric-react";
+import {  
+    Label, 
+    PrimaryButton,
+    // DefaultButton 
+} from "office-ui-fabric-react";
 import { ActivitiesAndControlpointsProps } from "./ActivitiesAndControlpointsProps";
 import { IActivity } from "../Models/IActivity";
 import { IControlPoints } from "../Models/IControlPoints";
+
 //import { IActivity } from "../Models/IActivity";
 
 
@@ -37,19 +50,13 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
     const [myControls, setMyControls] = useState([]);
     const [myActivitieslistColumns, setmyActivitiesListColumns] = useState<IColumn[]>([]);
     const [myControlslistColumns, setmyControlsListColumns] = useState<IColumn[]>([]);
-    const [hideDialog, setHideDialog] = useState(true);
-   // const [onActivityDone, setOnActivityDone] = useState(null);
+    const [updateListItems, setUpdateListItems] = useState(null);
+    const [selectedActivityItem, setSelectedActivityItem] = useState<IActivity>({});
+    const [selectedControlPointItem, setSelectedControlPointItem] = useState<IControlPoints>({});
+    const [openPanel, setOpenPanel] = useState(null);
+    // const [userForSelectedItem, setUserForSelectedItem] = useState([]);
 
-   const modelProps = {
-    isBlocking: false,
-    styles: { main: { maxWidth: 450 } },
-  };
-  const dialogContentProps = {
-    type: DialogType.largeHeader,
-    title: 'All emails together',
-    subText: 'Your Inbox has changed. No longer does it include favorites, it is a singular destination for your emails.',
-  };
-    
+    // const _getUserForSelectedItem = (props: IUser[]): void => {  setUserForSelectedItem(props);}
     const onUpdateActivityDone = (activity: IActivity): void =>{
         const upDateData = async (): Promise<any> =>{
             try{
@@ -61,11 +68,12 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
                 console.error(err);
             }       
         }
+        setUpdateListItems(true);
         upDateData().catch((err) => {
             console.error(err);
         });
     }
-    const onControlPointDone = (control: IControlPoints): void =>{
+    const onUpdateControlPointDone = (control: IControlPoints): void =>{
         const upDateData = async (): Promise<any> =>{
             try{
                await sp.web.lists.getByTitle('Control').items.getById(control.Id).update({
@@ -76,28 +84,25 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
                 console.error(err);
             }       
         }
+        setUpdateListItems(true);
         upDateData().catch((err) => {
             console.error(err);
         });
     }
-    const  onOpenSelectedItem = (control : IControlPoints): JSX.Element =>{
-        setHideDialog(false);
-         return (<div>
-        <DefaultButton secondaryText="Opens the Sample Dialog" onClick={() => setHideDialog(true)} text="Open Dialog" />
-        <Dialog
-                hidden={hideDialog}
-                onDismiss={() => setHideDialog(true)}
-                dialogContentProps={dialogContentProps}
-                modalProps={modelProps}
-                >
-                <DialogFooter>
-                <PrimaryButton onClick={() => setHideDialog(true)} text="Save" />
-                <DefaultButton onClick={() => setHideDialog(true)} text="Cancel" />
-                </DialogFooter>
-        </Dialog>
-         </div>);
-    }
 
+    const getSelectedActivityItem = (selectedItem: IActivity): void =>{
+        setOpenPanel(true);
+        setSelectedActivityItem(selectedItem);
+        setSelectedControlPointItem({});
+    }
+    const getSelectedControlPointItem = (selectedItem: IControlPoints): void =>{
+        setOpenPanel(true);
+        setSelectedControlPointItem(selectedItem);
+        setSelectedActivityItem({});
+    }
+    const onPanelToggleDismiss = (): void =>{
+        setOpenPanel(false);
+    }
 //     useEffect(() => {
 //     const handleResize = (): void => {
 //       setWindowWidth(window.innerWidth);
@@ -131,21 +136,25 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
             {
                 key: 'column6', name: '', fieldName: 'isDone', minWidth: 100, maxWidth: 250, isResizable: true, onRender:(activity: IActivity)  => {
                   const isDone : boolean = activity.isDone; 
-                  console.log(isDone);
                   const onShowButtonText = "Visa";  
                   const buttonText = isDone === true ? 'Klarmarkerad' : 'Klarmarkera';  
                   return(<div style={{display:'flex',flexWrap: 'wrap', flexDirection: 'row-reverse'}}> 
                     <PrimaryButton 
                     disabled={isDone}
                     text={buttonText}
-                    style={{width: '119px', marginTop:'5px', height: '25px'}}
+                    // style={{width: activity
                     onClick={() => onUpdateActivityDone(activity)}                 
                     />
                     <PrimaryButton 
-                    style={{float: 'left', width: '119px', marginTop:'5px', height: '25px'}}
+                    style={{
+                        float: 'left', 
+                        width: '119px', 
+                        marginTop:'5px', 
+                        // height: '25px'
+                    }}
                     disabled={false}
                     text={onShowButtonText}
-                    onClick={() => onOpenSelectedItem(activity)}                 
+                    onClick={() => getSelectedActivityItem(activity)}                 
                     />
                   </div>)
                 }
@@ -177,16 +186,21 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
                   const onShowButtonText = "Visa";
                   return(<div style={{display:'flex',flexWrap: 'wrap', flexDirection: 'row-reverse'}}>
                     <PrimaryButton 
-                    style={{width: '119px', marginTop:'5px', height: '25px'}}
+                    // style={{width: '119px', marginTop:'5px', height: '25px'}}
                     disabled={isDone}
                     text={onSaveButtonText}
-                    onClick={() => onControlPointDone(control)}                 
+                    onClick={() => onUpdateControlPointDone(control)}                 
                     />
                     <PrimaryButton 
-                    style={{float: 'left', width: '119px', marginTop:'5px', height: '25px'}}
+                    style={{
+                        float:'left',
+                        width: '119px',
+                        marginTop:'5px', 
+                        //   height: '25px'
+                        }}
                     disabled={false}
                     text={onShowButtonText}
-                    onClick={() =>  onOpenSelectedItem(control) }                 
+                    onClick={() =>  getSelectedControlPointItem(control) }                 
                     />
                   </div>)
                 }
@@ -195,7 +209,6 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
         setmyActivitiesListColumns(activitiesListColumns);
         setmyControlsListColumns(controlListColumns);
     },[]);
-
     useEffect(() => {
         const fetchActivityData = async (): Promise<any> => {
             try {
@@ -208,7 +221,7 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
                 'DueDate',
                 'isDone',
                 'Responsible/Title',
-                'Responsible/ID'
+                'Responsible/ID',
                 ).expand('Projekt', 'Responsible').orderBy('Modified', true).getAll();
             
                 const myActivities = activityItems.map((activity: any) => ({     
@@ -218,8 +231,9 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
                     DueDate: moment(activity.DueDate).format('YYYY-MM-DD'),
                     Responsible: activity.Responsible.Title,
                     Projekt: activity.Projekt.Title,
-                    isDone: activity.isDone                   
+                    isDone: activity.isDone             
                 }));
+                    setUpdateListItems(false);
                     setMyActivities(myActivities);
                 }
                 catch (error) {
@@ -229,7 +243,7 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
         fetchActivityData().catch((err) => {
             console.error(err);
         });
-    }, []); 
+    }, [updateListItems]); 
     useEffect(() => {
         const fetchControlPointsData = async (): Promise<any> => {
             try {
@@ -257,6 +271,7 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
                     Date: moment(control.Date).format('YYYY-MM-DD'),
                     isDone: control.isDone             
                 }));
+                    setUpdateListItems(false);
                     setMyControls(myControls);
                 }
                 catch (error) {
@@ -266,9 +281,111 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
         fetchControlPointsData().catch((err) => {
             console.error(err);
         });
-    }, []); 
+    }, [updateListItems]); 
 
     return(<React.Fragment>
+        <div>
+        <Panel
+          headerText="Egenskaper"
+          type={PanelType.smallFixedFar}
+          isOpen={openPanel}
+          onDismiss={onPanelToggleDismiss}
+          // You MUST provide this prop! Otherwise screen readers will just say "button" with no label.
+          closeButtonAriaLabel="Close"
+        >
+        {selectedActivityItem.Title !== undefined ? 
+          <div>
+        <TextField 
+        label="Rubrik" 
+        value={selectedActivityItem.Title} 
+        disabled={true}
+        />
+         <TextField 
+        label="Projekt" 
+        value={selectedActivityItem.Projekt} 
+        disabled={true}
+        />
+        <TextField 
+        label="Beskrivning" 
+        value={selectedActivityItem.Description} 
+        disabled={true}
+        multiline={true}
+        rows={6}
+        />
+         <TextField 
+        label="Ansvarig" 
+        value={selectedActivityItem.Responsible} 
+        disabled={true}
+        />
+        <DatePicker 
+         label='Förfallodatum'
+         disabled={true}
+         placeholder={moment(selectedActivityItem.DueDate).format('YYYY-MM-DD')}
+        />
+        {/* <PeoplePicker
+              context={props.context}
+              titleText="Projektledare"
+              personSelectionLimit={1}
+              //showtooltip={true}
+              required={true}
+              //onChange={ _getUserForSelectedItem }
+              //showHiddenInUI={false}
+               principalTypes={[PrincipalType.User]}
+            defaultSelectedUsers={selectedActivityItem.Responsible}
+             resolveDelay={1000} 
+             /> */}
+        </div> 
+          : null}
+          {selectedControlPointItem.Title !== undefined ?
+          <div>
+          <TextField 
+          label="Rubrik" 
+          value={selectedControlPointItem.Title} 
+          disabled={true}
+          />
+           <TextField 
+          label="Projekt" 
+          value={selectedControlPointItem.Projekt} 
+          disabled={true}
+          />
+          <TextField 
+          label="Beskrivning" 
+          value={selectedControlPointItem.Description} 
+          disabled={true}
+          multiline={true}
+          rows={6}
+          />
+           <TextField 
+          label="Kontrolltyp" 
+          value={selectedControlPointItem.ControlType} 
+          disabled={true}
+          />
+            <TextField 
+          label="Genomförd av" 
+          value={selectedControlPointItem.ImplementedBy} 
+          disabled={true}
+          />
+          <DatePicker 
+           label='Datum'
+           disabled={true}
+           placeholder={moment(selectedActivityItem.DueDate).format('YYYY-MM-DD')}
+          />
+          {/* <PeoplePicker
+                context={props.context}
+                titleText="Projektledare"
+                personSelectionLimit={1}
+                //showtooltip={true}
+                required={true}
+                //onChange={ _getUserForSelectedItem }
+                //showHiddenInUI={false}
+                 principalTypes={[PrincipalType.User]}
+              defaultSelectedUsers={selectedActivityItem.Responsible}
+               resolveDelay={1000} 
+               /> */}
+          </div> : null  
+        }
+        </Panel>
+        </div>
         <Label
         style={{fontSize:20, fontWeight: 500, marginBottom: 10}}
         >

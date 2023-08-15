@@ -3,13 +3,13 @@ export interface IProject{
     Title?: string;
     ProjectType?: string;
     ProjectTypeId?: number;
-    ProjectLeader?:string;
-    ProjectLeaderId?: number;
-    ProjectManagerId?: number;
-    ProjectManager?:string;
+    ProjectLeader?:any;
+    ProjectLeaderId?: any;
+    ProjectManager?:any;
+    ProjectManagerId?: any;
+    ProjectMembers?:any;
     ProjectMembersId?: any;
-    ProjectMembers?:string;
-    ProjectNumberId?: number;
     Customer?: string;
     ProjectImage?: string;
+    Status?: string;
 }

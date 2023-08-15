@@ -80,10 +80,6 @@
   padding-top: 30px;
 }
 .myProjects{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  flex-wrap: wrap;
   width: 100%;
 }
 .projectActivityWrapper{
@@ -91,8 +87,8 @@
 }
 .myProjectsColumn{
   @include ms-Grid-col;
-  @include ms-lg2;
-  @include ms-xl2;
+  @include ms-lg3;
+  @include ms-xl3;
   @include ms-sm12;
   @include ms-xlPush2;
   @include ms-lgPush1;
@@ -100,8 +96,8 @@
 }
 .myActivitiesColumn{
   @include ms-Grid-col;
-  @include ms-lg8;
-  @include ms-xl8;
+  @include ms-lg7;
+  @include ms-xl7;
   @include ms-xlPush2;
   @include ms-lgPush1;
   margin-top: 40px
@@ -120,6 +116,10 @@
   font-size: 18;
   font-weight: 400;
   padding: 30px 30px 30px 30px;
+}
+.documentCardTitle{
+  height: 23px;
+  padding: 1px 8px;
 }
 .welcomeImage {
   width: 100%;
