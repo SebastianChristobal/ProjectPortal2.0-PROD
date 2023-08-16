@@ -8,6 +8,7 @@ export interface IActivity{
     ProjektId?: string;
     isDone?: boolean;
     Description?: string;
-    Responsible?: string;
+    Responsible?: any;
+    ResponsibleId?: any; 
     DueDate?: Date;
 }

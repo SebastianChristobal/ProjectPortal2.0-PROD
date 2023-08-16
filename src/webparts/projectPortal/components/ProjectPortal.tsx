@@ -20,10 +20,8 @@ import Start from './Start/Start';
 import ProjectDetail from './MyProjects/ProjectDetails/ProjectDetail';
 import NewATA from './NewATA/NewATA';
 import NewControlPoint from './NewControlPoint/NewControlPoint';
-//import { initializeIcons } from '@uifabric/icons';
-//import NewProject from './NewProject/NewProject';
-//import NewProject from './NewProject/NewProject';
-
+import AllProjects from './AllProjects/AllProjects';
+import NewActivity from './NewActivity/NewActivity';
 
 const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps) =>{
   const {SPHttpClient, context, siteAbsolutetUrl} = props;
@@ -49,9 +47,9 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
     if(item.props.itemKey === 'RegisterCompletedControl'){
       window.open(`#/registreraKontrollPunkt`, "_self");
     }
-    // if(item.props.itemKey === 'registerATA'){
-    //   window.open(`#/registerATA`, "_self");
-    // }
+    if(item.props.itemKey === 'registerActivity'){
+      window.open(`#/registreraAktivitet`, "_self");
+    }
   }
 
   return(
@@ -84,6 +82,10 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
              headerText="Visa alla projekt"    
              itemKey="showAllProjects"
              />
+              <PivotItem 
+             headerText="Registrera aktivitet"        
+             itemKey="registerActivity"
+             />
              <PivotItem 
              headerText="Registrera ÄTA"        
              itemKey="registerATA"
@@ -101,15 +103,18 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
       <Route path={'/nyttProjekt/'} render={(props: any) =>
           <NewProject {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
+         <Route path={'/allaProjekt/'} render={(props: any) =>
+          <AllProjects {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
+        } />
          <Route path={'/registeraATA/'} render={(props: any) =>
         <NewATA {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
           <Route path={'/registreraKontrollPunkt/'} render={(props: any) =>
         <NewControlPoint {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
-            {/* <Route path={'/allaProjekt/'} render={(props: any) =>
-        <NewATA {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
-        } /> */}
+            <Route path={'/registreraAktivitet/'} render={(props: any) =>
+        <NewActivity {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
+        } />
       <Route path={'/ProjektDetaljer/:id'} render={(props: any) =>
         <ProjectDetail {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />

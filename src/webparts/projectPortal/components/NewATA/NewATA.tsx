@@ -24,7 +24,6 @@ import {
   Label
  } from "office-ui-fabric-react";
 import { INewATAProps } from "./INewATAProps";
-
 import styles from "../ProjectPortal.module.scss";
 import { IProject } from "../Models";
 import { IATA } from "../Models/IATA";
@@ -91,8 +90,6 @@ useEffect(() => {
       console.error(err);
   });
 }, []); 
-
-
 
   return(<React.Fragment>
     <div className={styles.newProjectWrapper}>

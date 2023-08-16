@@ -7,6 +7,10 @@ import {
     Dropdown, 
     IDropdownOption
  } from '@fluentui/react/lib/Dropdown';
+ import { 
+  PeoplePicker, 
+  PrincipalType 
+} from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
@@ -15,64 +19,72 @@ import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";  
 import "@pnp/sp/fields";
- import { IItemAddResult } from "@pnp/sp/items";
- import { spfi, SPFx } from "@pnp/sp";
-// import {INewProjectProps} from './INewProjectProps';
+import { IItemAddResult } from "@pnp/sp/items";
+import { spfi, SPFx } from "@pnp/sp";
 import { TextField } from '@fluentui/react/lib/TextField';
-//import { IOptions } from "../Models";
 import { 
   PrimaryButton, 
-  Label
+  Label,
+  DatePicker
  } from "office-ui-fabric-react";
 import { INewControlPointProps } from "./INewControlPointProps";
-//import { IField, IFieldInfo } from "@pnp/sp/fields/types";
 import styles from "../ProjectPortal.module.scss";
 import { IControlPoints } from "../Models/IControlPoints";
-import { IProject } from "../Models";
+import { IProject, IUser } from "../Models";
 
 const NewControlPoint: React.FC<INewControlPointProps> = (props) =>{
   const sp = spfi().using(SPFx(props.context));
 
   const [titleValue, setTitleValue] = useState<string>('');   
-  const [customerValue, setCustomerValue] = useState<string>('');  
-  const [extentValue, setExtentValue] = useState<string>('');  
-  const [priceValue, setPriceValue] = useState<string>(''); 
-  const [optValue, setOptValue] = useState<any>(null);
+  const [descriptionValue, setDescriptionValue] = useState<string>('');  
+  const [projectOptionsValue, setProjectOptionsValue] = useState<any>(null);
+  const [selectedDateValue, setSelectedDateValue] = useState<Date>(null);
   const [optControlTypeValue, setOptControlTypeValue] = useState<any>(null);
-  const [dropdownOptions, setDropdownOptions] = useState<IDropdownOption[]>([]);
+  const [projectDropdownOptions, setProjectDropdownOptions] = useState<IDropdownOption[]>([]);
   const [controlTypeOptions, setControlTypeOptions] = useState<IDropdownOption[]>([]);
+  const [implementedBy, setImplementedBy] = useState([]);
+  const _getImplementedBy = (props: IUser[]): void => {  setImplementedBy(props);}
 
-
-const _onOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
-    setOptValue(option.key);
+const _onProjectOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
+  setProjectOptionsValue(option.key);
 }
 const _onControlTypeOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
-    setOptControlTypeValue(option.key);
+    setOptControlTypeValue(option.text);
 }
 const _onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
   setTitleValue(newValue);
 }
-const _onCustomerTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
-  setCustomerValue(newValue);
+const _onDescTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
+  setDescriptionValue(newValue);
 }
-const _onExtentTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
-  setExtentValue(newValue);
-}
-const _onPriceTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
-  setPriceValue(newValue);
+const _onDateChange = (date: Date | null | undefined):void => {
+  setSelectedDateValue(date);
 }
 
 const onSaveControlPoint = async (): Promise<any>  => {
-  const ata: IControlPoints = {
+  const implementedByUser = implementedBy.map((items: IUser) =>{return items.id})[0];
+  const selectedUser = await sp.web.ensureUser(implementedByUser);
+  const controlPoint: IControlPoints = {
       Title: titleValue,
+      ProjektId: projectOptionsValue,
+      Description: descriptionValue,
+      ControlType: optControlTypeValue,
+      Date: selectedDateValue,
+      ImplementedById: selectedUser.data.Id
   }
   try{
-       const iar: IItemAddResult = await sp.web.lists.getByTitle("Control").items.add(ata)
+       const iar: IItemAddResult = await sp.web.lists.getByTitle("Control").items.add(controlPoint);
        console.log(iar);
       }
   catch(error){
       console.error(error);
       } 
+      // setTitleValue('');
+      // setDescriptionValue('');
+      // setProjectOptionsValue(null);
+      // setSelectedDateValue(null);
+      // setOptControlTypeValue(null);
+      // setImplementedBy(null);
 }
 
 useEffect(() => {
@@ -83,7 +95,7 @@ useEffect(() => {
               key: project.Id,
               text: project.Title
           }));
-          setDropdownOptions(dropdownOptions);
+          setProjectDropdownOptions(dropdownOptions);
           }
           catch (error) {
               console.error(error);
@@ -96,7 +108,7 @@ useEffect(() => {
 }, []); 
 
 useEffect(() => {
-    const options : IDropdownOption[] = [{ key: 'Kvalitetskontroll', text: 'Kvalitetskontroll'   }, {  key: 'Brandskyddskontroll', text: 'Brandskyddskontroll'}]
+    const options : IDropdownOption[] = [{ key: '1', text: 'Säkerhetskontroll'   }, {  key: '2', text: 'Kvalitetskontroll'}, {  key: '3', text: 'Brandskyddskontroll'}]
     setControlTypeOptions(options)
     // const fetchProjectsData = async (): Promise<any> => {
     //     try {
@@ -117,13 +129,6 @@ useEffect(() => {
     // });
   }, []); 
 
-console.log(optValue);
-console.log(dropdownOptions);
-console.log(titleValue);
-console.log(customerValue);
-console.log(extentValue);
-console.log(priceValue);
-console.log(optControlTypeValue);
 
   return(<React.Fragment>
     <div className={styles.newProjectWrapper}>
@@ -146,8 +151,8 @@ console.log(optControlTypeValue);
         <Dropdown
                  placeholder="Välj projekt"
                 label="Projekt"
-                options={ dropdownOptions }
-                 onChange={ _onOptionsChange }
+                options={ projectDropdownOptions }
+                 onChange={ _onProjectOptionsChange }
                 required={true}
                // onChange={dropdownOpt}
             />
@@ -170,21 +175,34 @@ console.log(optControlTypeValue);
                required={true}
                multiline={true}
                rows={6}
-               onChange={ _onCustomerTextFieldChange }  
+               onChange={ _onDescTextFieldChange }  
              />
-              <TextField 
-               label="Omfattning"
-               required={true}
-               onChange={ _onExtentTextFieldChange } 
+              <DatePicker 
+               label="Datum"
+               onSelectDate={ _onDateChange } 
              />
-              <TextField 
-               label="Ungefärlig prisuppgift i SEK"
-               required={true}
-               onChange={ _onPriceTextFieldChange } 
+              <PeoplePicker
+              context={props.context}
+              titleText="Genomförs av"
+              personSelectionLimit={1}
+              //showtooltip={true}
+              required={true}
+              onChange={ _getImplementedBy }
+              //showHiddenInUI={false}
+               principalTypes={[PrincipalType.User]}
+            //defaultSelectedUsers={this.state.selectedUsers}
+             resolveDelay={1000} 
              />
              <div className={styles.buttonWrapper}>
                 <PrimaryButton 
-                disabled={!titleValue || !customerValue || !extentValue || !priceValue || !optValue || !dropdownOptions || !optControlTypeValue }
+                disabled={
+                  !titleValue || 
+                  !descriptionValue || 
+                  !projectOptionsValue || 
+                  !selectedDateValue || 
+                  !optControlTypeValue ||
+                  !implementedBy.map((items: IUser) =>{return items.id})[0] 
+                }
                 text="Skapa genomförd kontroll"
                 onClick={ onSaveControlPoint}
                 />

@@ -216,14 +216,15 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
                 .select(
                 'Id',    
                 'Title', 
-                'Projekt/Title','Projekt/ID', 
+                'Projekt/Title',
+                'Projekt/ID', 
                 'Description',
                 'DueDate',
                 'isDone',
                 'Responsible/Title',
                 'Responsible/ID',
                 ).expand('Projekt', 'Responsible').orderBy('Modified', true).getAll();
-            
+                console.log(activityItems);
                 const myActivities = activityItems.map((activity: any) => ({     
                     Id: activity.Id,              
                     Title: activity.Title,
@@ -251,28 +252,28 @@ const ActivitiesAndControlpoints: React.FC<ActivitiesAndControlpointsProps> = (p
                 .select(
                 'Id',   
                 'Title',
+                'Projekt/Title',
+                'Projekt/ID', 
                 'ControlType',
                 'Description',
                 'Date',
                 'isDone',
                 'ImplementedBy/Title',
                 'ImplementedBy/ID', 
-                'Projekt/Title',
-                'Projekt/ID'
                 ).expand('Projekt','ImplementedBy').orderBy('Modified', true).getAll();
+
+                console.log(controlItems);
             
-                const myControls = controlItems.map((control: any) => ({               
+                const myControlPoints = controlItems.map((control: any) => ({               
                     Id: control.Id,    
                     Title: control.Title,
-                    Projekt: control.Projekt.Title,
                     Description: control.Description,
                     ControlType: control.ControlType,
-                    ImplementedBy: control.ImplementedBy.Title,
                     Date: moment(control.Date).format('YYYY-MM-DD'),
                     isDone: control.isDone             
                 }));
                     setUpdateListItems(false);
-                    setMyControls(myControls);
+                    setMyControls(myControlPoints);
                 }
                 catch (error) {
                     console.error(error);

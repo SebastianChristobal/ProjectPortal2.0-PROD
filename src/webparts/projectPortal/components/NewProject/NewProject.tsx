@@ -61,8 +61,8 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
         const responsibleManagerUser = responsibleManager.map((items: IUser) =>{return items.id})[0];
         const projectMembersUser: number[] = [];
         projectMembers.map( async (items: IUser) => {
-            const selectedProjectManager = await sp.web.ensureUser(items.id);
-            projectMembersUser.push(selectedProjectManager.data.Id); // Push the Id into the array
+            const selectedProjectMembers = await sp.web.ensureUser(items.id);
+            projectMembersUser.push(selectedProjectMembers.data.Id); // Push the Id into the array
         });
         const selectedProjectManager = await sp.web.ensureUser(projectManagerUser);
         const selectedResponsibleManager = await sp.web.ensureUser(responsibleManagerUser);
@@ -183,6 +183,21 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
              <div className={styles.buttonWrapper}>
                 <PrimaryButton 
                 text="Skapa projekt"
+                disabled={
+                    !titleValue ||
+                    !customerValue ||
+                    !optValue ||
+                    !projectManager.map((items: IUser) =>{return items.id})[0] ||
+                    !responsibleManager.map((items: IUser) =>{return items.id})[0] ||
+                    !projectMembers.map((items: IUser) =>{return items.id})[0]
+                }
+                // const [titleValue, setTitleValue] = useState<string>('');   
+                // const [customerValue, setCustomerValue] = useState<string>('');  
+                // const [optValue, setOptValue] = useState<any>(null);
+                // const [dropdownOptions, setDropdownOptions] = useState<IDropdownOption[]>([]);
+                // const [projectManager, setProjectManager] = useState([]);
+                // const [responsibleManager, setResponsibleManager] = useState([]);
+                // const [projectMembers, setprojectMembers] = useState([]);
                 onClick={ onSaveProject}
                 />
              </div>
