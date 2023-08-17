@@ -28,7 +28,6 @@ import styles from "../ProjectPortal.module.scss";
 import { IProject } from "../Models";
 import { IATA } from "../Models/IATA";
 
-
 const NewATA: React.FC<INewATAProps> = (props) =>{
   const sp = spfi().using(SPFx(props.context));
 
@@ -65,6 +64,11 @@ const onSaveATA = async (): Promise<any>  => {
   }
   try{
        const iar: IItemAddResult = await sp.web.lists.getByTitle("ATA").items.add(ata)
+       setTitleValue('');
+       setCustomerValue('');
+       setExtentValue('');
+       setPriceValue('');
+       setOptValue(null);
        console.log(iar);
       }
   catch(error){
@@ -114,28 +118,32 @@ useEffect(() => {
             label="Projekt"
             options={ dropdownOptions }
             onChange={ _onOptionsChange }
+            selectedKey={optValue}
             required={true}
-            // onChange={dropdownOpt}
           />
           <TextField 
             label="Rubrik"
             // errorMessage="Error message" 
             required={true}
+            value={titleValue}
             onChange={ _onTitleTextFieldChange }
             />
           <TextField 
             label="Beställare"
             required={true}
+            value={customerValue}
             onChange={ _onCustomerTextFieldChange } 
           />
           <TextField 
             label="Omfattning"
             required={true}
+            value={extentValue}
             onChange={ _onExtentTextFieldChange } 
           />
           <TextField 
             label="Ungefärlig prisuppgift i SEK"
             required={true}
+            value={priceValue}
             onChange={ _onPriceTextFieldChange } 
           />
             <div className={styles.buttonWrapper}>

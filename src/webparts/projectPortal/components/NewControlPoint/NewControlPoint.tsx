@@ -40,6 +40,7 @@ const NewControlPoint: React.FC<INewControlPointProps> = (props) =>{
   const [projectOptionsValue, setProjectOptionsValue] = useState<any>(null);
   const [selectedDateValue, setSelectedDateValue] = useState<Date>(null);
   const [optControlTypeValue, setOptControlTypeValue] = useState<any>(null);
+  const [optControlTypeKey, setOptControlTypeKey] = useState<any>(null);
   const [projectDropdownOptions, setProjectDropdownOptions] = useState<IDropdownOption[]>([]);
   const [controlTypeOptions, setControlTypeOptions] = useState<IDropdownOption[]>([]);
   const [implementedBy, setImplementedBy] = useState([]);
@@ -50,6 +51,7 @@ const _onProjectOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?
 }
 const _onControlTypeOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
     setOptControlTypeValue(option.text);
+    setOptControlTypeKey(option.key)
 }
 const _onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
   setTitleValue(newValue);
@@ -74,17 +76,18 @@ const onSaveControlPoint = async (): Promise<any>  => {
   }
   try{
        const iar: IItemAddResult = await sp.web.lists.getByTitle("Control").items.add(controlPoint);
+      setTitleValue('');
+      setDescriptionValue('');
+      setProjectOptionsValue(null);
+      setSelectedDateValue(null);
+      setOptControlTypeKey(null);
+      setImplementedBy([]);
        console.log(iar);
       }
   catch(error){
       console.error(error);
       } 
-      // setTitleValue('');
-      // setDescriptionValue('');
-      // setProjectOptionsValue(null);
-      // setSelectedDateValue(null);
-      // setOptControlTypeValue(null);
-      // setImplementedBy(null);
+     
 }
 
 useEffect(() => {
@@ -149,37 +152,43 @@ useEffect(() => {
         </div>
         <div className={styles.newProjectForm}>
         <Dropdown
-                 placeholder="Välj projekt"
+                placeholder="Välj projekt"
                 label="Projekt"
                 options={ projectDropdownOptions }
-                 onChange={ _onProjectOptionsChange }
+                onChange={ _onProjectOptionsChange }
                 required={true}
+                defaultValue={projectOptionsValue}
+                selectedKey={projectOptionsValue}
                // onChange={dropdownOpt}
             />
             <TextField 
              label="Rubrik"
              // errorMessage="Error message" 
+             value={ titleValue }
              required={true}
              onChange={ _onTitleTextFieldChange }
              />
                <Dropdown
-                 placeholder="Välj kontrolltyp"
+                placeholder="Välj kontrolltyp"
                 label="Kontrolltyp"
                 options={ controlTypeOptions }
-                 onChange={ _onControlTypeOptionsChange }
+                onChange={ _onControlTypeOptionsChange }
                 required={true}
-               // onChange={dropdownOpt}
+                selectedKey={optControlTypeKey}
+                defaultValue={projectOptionsValue}
             />
              <TextField 
                label="Beskrivning"
                required={true}
                multiline={true}
                rows={6}
+               value={descriptionValue}
                onChange={ _onDescTextFieldChange }  
              />
               <DatePicker 
                label="Datum"
                onSelectDate={ _onDateChange } 
+               value={selectedDateValue}
              />
               <PeoplePicker
               context={props.context}
@@ -187,11 +196,12 @@ useEffect(() => {
               personSelectionLimit={1}
               //showtooltip={true}
               required={true}
+              defaultSelectedUsers={implementedBy}
               onChange={ _getImplementedBy }
               //showHiddenInUI={false}
                principalTypes={[PrincipalType.User]}
-            //defaultSelectedUsers={this.state.selectedUsers}
-             resolveDelay={1000} 
+               
+              resolveDelay={1000} 
              />
              <div className={styles.buttonWrapper}>
                 <PrimaryButton 

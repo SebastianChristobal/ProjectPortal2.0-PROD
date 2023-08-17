@@ -71,17 +71,17 @@ const NewActivity: React.FC<INewActivityProps> = (props) =>{
     }
     try{
          const iar: IItemAddResult = await sp.web.lists.getByTitle("Activity").items.add(activities);
+         setTitleValue('');
+         setdescValue('');
+         setSelectedDateValue(null);
+         setProjectOptionsValue(null);
+         setManager([]);
          console.log(iar);
         }
     catch(error){
         console.error(error);
         } 
-        // setTitleValue('');
-        // setDescriptionValue('');
-        // setProjectOptionsValue(null);
-        // setSelectedDateValue(null);
-        // setOptControlTypeValue(null);
-        // setImplementedBy(null);
+     
   }
 
    useEffect(() => {
@@ -127,12 +127,14 @@ return(<React.Fragment>
             options={ dropdownOptions }
             onChange={ _onProjectOptionsChange }
             required={true}
+            selectedKey={projectOptionsValue}
             // onChange={dropdownOpt}
           />
           <TextField 
             label="Rubrik"
             // errorMessage="Error message" 
             required={true}
+            value={titleValue}
             onChange={ _onTitleTextFieldChange }
             />
           <TextField 
@@ -140,10 +142,12 @@ return(<React.Fragment>
             multiline={true}
             rows={6}
             required={true}
+            value={descValue}
             onChange={ _onDescTextFieldChange } 
           />
             <DatePicker 
                label="Förfallodatum"
+               value={selectedDateValue}
                onSelectDate={ _onDateChange } 
              />
         <PeoplePicker
@@ -153,6 +157,7 @@ return(<React.Fragment>
               //showtooltip={true}
               required={true}
               onChange={ _getManager }
+              defaultSelectedUsers={manager}
               //showHiddenInUI={false}
                principalTypes={[PrincipalType.User]}
             //defaultSelectedUsers={this.state.selectedUsers}

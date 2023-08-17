@@ -77,6 +77,12 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
         }
         try{
              const iar: IItemAddResult = await sp.web.lists.getByTitle("Projekt").items.add(project)
+             setTitleValue('');
+             setCustomerValue('');
+             setOptValue(null);
+             setProjectManager([]);
+             setResponsibleManager([]);
+             setprojectMembers([]);
              console.log(iar);
             }
         catch(error){
@@ -129,17 +135,20 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
             label="Rubrik"
             // errorMessage="Error message" 
             required={true}
+            value={titleValue}
             onChange={ _onTitleTextFieldChange }
              />
              <TextField 
                label="Kund"
                required={true}
+               value={customerValue}
                onChange={ _onCustomerTextFieldChange } 
              />
                <Dropdown
                  placeholder="välj projekttyp"
                 label="Projekttyp"
                 options={ dropdownOptions }
+                selectedKey={optValue}
                 onChange={ _onOptionsChange }
                 required={true}
                // onChange={dropdownOpt}
@@ -150,6 +159,7 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
               personSelectionLimit={1}
               //showtooltip={true}
               required={true}
+              defaultSelectedUsers={projectManager}
               onChange={ _getProjectManager }
               //showHiddenInUI={false}
                principalTypes={[PrincipalType.User]}
@@ -162,6 +172,7 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
               personSelectionLimit={1}
               //showtooltip={true}
               required={true}
+              defaultSelectedUsers={responsibleManager}
               onChange={ _getResponsibleManager }
               //showHiddenInUI={false}
                principalTypes={[PrincipalType.User]}
@@ -174,6 +185,7 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
               personSelectionLimit={10}
               //showtooltip={true}
               required={true}
+              defaultSelectedUsers={projectMembers}
               onChange={ _getProjectMembers }
               //showHiddenInUI={false}
                principalTypes={[PrincipalType.User]}
@@ -191,13 +203,6 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
                     !responsibleManager.map((items: IUser) =>{return items.id})[0] ||
                     !projectMembers.map((items: IUser) =>{return items.id})[0]
                 }
-                // const [titleValue, setTitleValue] = useState<string>('');   
-                // const [customerValue, setCustomerValue] = useState<string>('');  
-                // const [optValue, setOptValue] = useState<any>(null);
-                // const [dropdownOptions, setDropdownOptions] = useState<IDropdownOption[]>([]);
-                // const [projectManager, setProjectManager] = useState([]);
-                // const [responsibleManager, setResponsibleManager] = useState([]);
-                // const [projectMembers, setprojectMembers] = useState([]);
                 onClick={ onSaveProject}
                 />
              </div>
