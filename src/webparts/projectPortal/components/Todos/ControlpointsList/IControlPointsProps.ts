@@ -1,5 +1,6 @@
 import { SPHttpClient } from "@microsoft/sp-http";
-export interface ActivitiesAndControlpointsProps{
+
+export interface IControlPointsProps{
     SPHttpClient?: SPHttpClient;
     siteAbsolutetUrl?: string;
     context?: any; 

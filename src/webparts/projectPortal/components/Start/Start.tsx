@@ -3,7 +3,7 @@ import { IStartProps } from "./IStartProps";
 import { Label } from "office-ui-fabric-react";
 import styles from "../ProjectPortal.module.scss";
 import MyProject from "../MyProjects/MyProjects";
-import ActivitiesAndControlpoints from "../ActivitiesAndControlpoints/ActivitiesAndControlpoints";
+import Todos from "../Todos/Todos";
 
 const Start : React.FC<IStartProps> = (props: IStartProps) =>{
     return(<React.Fragment>
@@ -28,7 +28,7 @@ const Start : React.FC<IStartProps> = (props: IStartProps) =>{
             <MyProject {...props} />
         </div>
         <div className={styles.myActivitiesColumn}>
-            <ActivitiesAndControlpoints {...props} />
+            <Todos {...props} />
         </div>
         </div>
     </div></React.Fragment>);

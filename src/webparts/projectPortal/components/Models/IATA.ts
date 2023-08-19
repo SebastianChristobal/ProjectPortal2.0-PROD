@@ -9,4 +9,5 @@ export interface IATA{
     Customer?: string;
     Extent?: string;
     Price?: string;
+    isDone?: boolean;
 }
