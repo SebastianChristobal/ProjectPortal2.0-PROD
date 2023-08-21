@@ -2,10 +2,11 @@ import * as React from "react";
 import { IATAProps } from "./IATAProps";
 import { useState, useEffect } from "react";
 import {
-  DetailsList,
-  SelectionMode,
-  IColumn,
-} from "@fluentui/react/lib/DetailsList";
+    DocumentCard,
+    DocumentCardDetails,
+    DocumentCardTitle,
+    DocumentCardType
+} from 'office-ui-fabric-react/lib/DocumentCard';
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
@@ -21,7 +22,7 @@ import {
   // IPivotStyles,
 } from "office-ui-fabric-react";
 import { spfi, SPFx } from "@pnp/sp";
-
+import styles from "../Todos.module.scss";
 import {
   PrimaryButton,
   // Label,
@@ -32,7 +33,6 @@ import { IATA } from "../../Models/IATA";
 const ATA: React.FC<IATAProps> = (props) =>{
 
     const sp = spfi().using(SPFx(props.context));
-    const [ATAlistColumns, setATAListColumns] = useState<IColumn[]>([]);
     const [ongoingATA, setOngoingATA] = useState([]);
     const [completedATA, setCompletedATA] = useState([]);
     const [selectedATAItem, setSelectedATAItem] =useState<IATA>({});
@@ -57,96 +57,10 @@ const ATA: React.FC<IATAProps> = (props) =>{
         });
       };
 
-      const getSelectedControlPointItem = (selectedItem: IATA): void => {
+      const getSelectedATAItem = (selectedItem: IATA): void => {
         setSelectedATAItem(selectedItem);
       };
     
-      useEffect(() => {
-        const ATAListColumns = [
-          {
-            key: "column1",
-            name: "Rubrik",
-            fieldName: "Title",
-            minWidth: 100,
-            maxWidth: 250,
-            isResizable: true,
-          },
-          {
-            key: "column2",
-            name: "Projekt",
-            fieldName: "Projekt",
-            minWidth: 100,
-            maxWidth: 250,
-            isResizable: true,
-          },
-          {
-            key: "column3",
-            name: "Beställare",
-            fieldName: "Customer",
-            minWidth: 100,
-            maxWidth: 250,
-            isResizable: true,
-          },
-          {
-            key: "column4",
-            name: "Omfattning",
-            fieldName: "Extent",
-            minWidth: 100,
-            maxWidth: 250,
-            isResizable: true,
-          },
-          {
-            key: "column5",
-            name: "Prissättning",
-            fieldName: "Price",
-            minWidth: 100,
-            maxWidth: 250,
-            isResizable: true,
-          },
-          {
-            key: "column7",
-            name: "",
-            fieldName: "isDone",
-            minWidth: 100,
-            maxWidth: 250,
-            isResizable: true,
-            onRender: (ata: IATA) => {
-              const isDone: boolean = ata.isDone;
-              const onSaveButtonText = isDone === true ? "Klarmarkerad" : "Klarmarkera";
-              const onShowButtonText = "Visa";
-              return (
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    flexDirection: "row-reverse",
-                  }}
-                >
-                  <PrimaryButton
-                    style={{width: '119px', marginTop:'5px', height: '35px'}}
-                   disabled={isDone}
-                   text={onSaveButtonText}
-                   onClick={() => onUpdateATADone(ata)}
-                  />
-                  <PrimaryButton
-                    style={{
-                      float: "left",
-                      width: "119px",
-                      marginTop: "5px",
-                         height: '35px'
-                    }}
-                    disabled={false}
-                    text={onShowButtonText}
-                    onClick={() => getSelectedControlPointItem(ata)}
-                  />
-                </div>
-              );
-            },
-          },
-        ];
-        setATAListColumns(ATAListColumns);
-      }, []);
-
       useEffect(() => {
         const fetchControlPointsData = async (): Promise<any> => {
           try {
@@ -201,6 +115,110 @@ const ATA: React.FC<IATAProps> = (props) =>{
       
       console.log(selectedATAItem);
 
+  const renderOngoingATA = (): JSX.Element => {
+
+     const ata: any = ongoingATA.length > 0 ? ongoingATA.map((items: IATA) =>{
+      const ataTitle = `Rubrik: ${items.Title}`;
+      const ataProject = `Projekt: ${items.Projekt}`;
+      const ataCustomer = `Beställare: ${items.Customer}`
+      const ataExtent = `Omfattning: ${items.Extent}`;
+      const ataPrice = `Prissättning: ${items.Price}`;
+      const isDone: boolean = items.isDone;
+      const onShowButtonText = "Visa";
+      const buttonText = isDone === true ? "Klarmarkerad" : "Klarmarkera";
+      return(<DocumentCard
+        key={items.Id}
+        type={DocumentCardType.compact}
+       // onClick={() => this.onOpenPanelHandler(items)}
+        style={{
+          maxWidth: '100%',
+          height: '100%',
+          marginTop: '15px',
+          padding: '5px'
+        }}
+      >
+        <DocumentCardDetails  >        
+        <DocumentCardTitle title={ataTitle} className={styles.cardTitle} />
+        <span key={items.Id} className={styles.cardItemProperties}>{ataProject}</span>
+        <span key={items.Id} className={styles.cardItemProperties}>{ataCustomer}</span>
+        <span key={items.Id} className={styles.cardItemProperties}>{ataExtent}</span>
+        <span key={items.Id} className={styles.cardItemProperties}>{ataPrice}</span>
+        <div style={{paddingLeft: '10px', paddingTop:'5px'}}>
+        <PrimaryButton
+                disabled={items.isDone}
+                text={buttonText}
+                onClick={() => onUpdateATADone(items)}
+              />
+              <PrimaryButton
+                style={{
+                  width: "119px",
+                  marginTop: "5px",
+                  marginLeft: '5px'
+                }}
+                disabled={false}
+                text={onShowButtonText}
+                onClick={() => getSelectedATAItem(items)}
+              />
+        </div>
+        </DocumentCardDetails>
+      </DocumentCard>)
+      
+    }) : null;
+    return ata;
+    }
+
+   const renderCompletedATA = ():JSX.Element =>{
+      const ata: any = completedATA.length > 0 ? completedATA.map((items: IATA) =>{
+        const ataTitle = `Rubrik: ${items.Title}`;
+        const ataProject = `Projekt: ${items.Projekt}`;
+        const ataCustomer = `Beställare: ${items.Customer}`
+        const ataExtent = `Omfattning: ${items.Extent}`;
+        const ataPrice = `Prissättning: ${items.Price}`;
+        const isDone: boolean = items.isDone;
+        const onShowButtonText = "Visa";
+        const buttonText = isDone === true ? "Klarmarkerad" : "Klarmarkera";
+        return(<DocumentCard
+          key={items.Id}
+          type={DocumentCardType.compact}
+         // onClick={() => this.onOpenPanelHandler(items)}
+          style={{
+            maxWidth: '100%',
+            height: '100%',
+            marginTop: '15px',
+            padding: '5px'
+          }}
+        >
+          <DocumentCardDetails  >        
+          <DocumentCardTitle title={ataTitle} className={styles.cardTitle} />
+          <span key={items.Id} className={styles.cardItemProperties}>{ataProject}</span>
+          <span key={items.Id} className={styles.cardItemProperties}>{ataCustomer}</span>
+          <span key={items.Id} className={styles.cardItemProperties}>{ataExtent}</span>
+          <span key={items.Id} className={styles.cardItemProperties}>{ataPrice}</span>
+          <div style={{paddingLeft: '10px', paddingTop:'5px'}}>
+          <PrimaryButton
+                  disabled={items.isDone}
+                  text={buttonText}
+                  onClick={() => onUpdateATADone(items)}
+                />
+                <PrimaryButton
+                  style={{
+                    width: "119px",
+                    marginTop: "5px",
+                    marginLeft: '5px'
+                  }}
+                  disabled={false}
+                  text={onShowButtonText}
+                  onClick={() => getSelectedATAItem(items)}
+                />
+          </div>
+          </DocumentCardDetails>
+        </DocumentCard>)
+        
+      }) : null;
+  
+      return ata;
+    }
+
       return<div>     
           <Pivot
         defaultSelectedKey={"0"}
@@ -215,17 +233,7 @@ const ATA: React.FC<IATAProps> = (props) =>{
               marginTop: 6,
             }}
           >
-          <DetailsList
-            items={ongoingATA}
-            columns={ATAlistColumns}
-            setKey="set"
-            selectionPreservedOnEmptyClick={true}
-            ariaLabelForSelectionColumn="Toggle selection"
-            ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-            checkButtonAriaLabel="select row"
-            //onColumnHeaderContextMenu={(column: IColumn, ev: React.MouseEvent<HTMLElement>) => this._onColumnContextMenu(column, ev)}
-            selectionMode={SelectionMode.none}
-          />
+         { renderOngoingATA() }
           </div> : <div style={{fontSize:'16px', paddingTop: '30px', paddingLeft:'10px', color: '#9b8f8f'}}>Inga aktiva ärenden...</div>}
         </PivotItem>
         <PivotItem headerText="Avslutade" itemKey="completed">
@@ -235,17 +243,7 @@ const ATA: React.FC<IATAProps> = (props) =>{
               marginTop: 6,
             }}
           >
-           <DetailsList
-            items={completedATA}
-            columns={ATAlistColumns}
-            setKey="set"
-            selectionPreservedOnEmptyClick={true}
-            ariaLabelForSelectionColumn="Toggle selection"
-            ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-            checkButtonAriaLabel="select row"
-            //onColumnHeaderContextMenu={(column: IColumn, ev: React.MouseEvent<HTMLElement>) => this._onColumnContextMenu(column, ev)}
-            selectionMode={SelectionMode.none}
-          />
+          { renderCompletedATA() }
           </div>
         </PivotItem>
       </Pivot>

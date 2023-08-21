@@ -28,6 +28,7 @@ const pivotStyles: Partial<IPivotStyles> = {
     borderWidth: "1px",
     marginRight: "7px",
     width: "auto",
+    borderRadius: "5px 5px 0px 0px"
   },
   linkIsSelected: {
     borderStyle: "solid",
@@ -35,10 +36,11 @@ const pivotStyles: Partial<IPivotStyles> = {
     borderColor: "black",
     marginRight: "7px",
     width: "auto",
+    borderRadius: "5px 5px 0px 0px"
   },
 };
 
-const MyTodos: React.FC<TodosProps> = (props) => {
+const Todos: React.FC<TodosProps> = (props) => {
   return (
     <React.Fragment>
       <Label style={{ fontSize: 20, fontWeight: 500, marginBottom: 10 }}>
@@ -88,4 +90,4 @@ const MyTodos: React.FC<TodosProps> = (props) => {
     </React.Fragment>
   );
 };
-export default MyTodos;
+export default Todos;
