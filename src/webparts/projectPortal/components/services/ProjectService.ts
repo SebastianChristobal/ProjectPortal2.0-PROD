@@ -4,13 +4,15 @@ import {
     ISPHttpClientOptions, 
    } from '@microsoft/sp-http';
 import { IOptions, IProject } from '../Models';
+import { WebPartContext } from '@microsoft/sp-webpart-base';
 const PROJECT_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Projekt')`;
 const PROJECTTYPE_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('ProjektTyp')`;
 
 
    export class ProjectService {
-
+    public context: WebPartContext;
     private _siteUrl: string;
+    private _spHttpClient: SPHttpClient;
     private _spHttpOptions: any = {
         getMetaData: <ISPHttpClientOptions>{
             headers: {
@@ -43,14 +45,20 @@ const PROJECTTYPE_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Proje
         }
     };
 
-    constructor(private siteAbsolutetUrl: string, private client: SPHttpClient) {
-    this._siteUrl = this.siteAbsolutetUrl; 
-    console.log(this._siteUrl);
-    }
+    constructor(context: WebPartContext) {
+        this.context = context;
+        this._siteUrl = this.context.pageContext.web.absoluteUrl;
+        this._spHttpClient = this.context.spHttpClient;
+        
+      }
 
-    public getMyProject(): Promise<any>{
+    public getcurrentUserProject(): Promise<any>{
         const promise: Promise<any> = new Promise<any>((resolve, reject)=>{
-            this.client.get(`${this._siteUrl}${PROJECT_LIST_API_ENDPOINT}/items`,
+            const selectQuery = `$select=Id,Title,ProjectManager/Title,ProjectMembers/Title,ProjectMembers/ID,ProjectManager/ID,ProjectLeader/Title,ProjectLeader/ID,absoluteSiteUrl`;
+            const expand = `&$expand=ProjectManager,ProjectLeader,ProjectMembers`;
+            const orderBy = `&orderBy='Modified'`;
+
+            this._spHttpClient.get(`${this._siteUrl}${PROJECT_LIST_API_ENDPOINT}/items?${selectQuery}${expand}${orderBy}`,
             // this.client.get(`https://karriarkonsulten.sharepoint.com/${LIST_API_ENDPOINT}/items?$select=Kontor`,
             SPHttpClient.configurations.v1,
             this._spHttpOptions.getMetaData).then((respone: SPHttpClientResponse): Promise<any> =>{
@@ -63,10 +71,32 @@ const PROJECTTYPE_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Proje
         }); 
         return promise;
     }
+      public async getAllActivities(projects: any): Promise<any>{
+
+        const promise: Promise<any> =  new  Promise<any>((resolve, reject) =>{
+            if(projects )
+            projects.map((project: any) =>{
+                const listsUrl = `${project.AbsoluteSiteUrl}/_api/web/lists/getbytitle('Todos')/items?$select=*,ContentType/Name&$expand=ContentType`;
+                this._spHttpClient.get(`${listsUrl}`,
+                // this.client.get(`https://karriarkonsulten.sharepoint.com/${LIST_API_ENDPOINT}/items?$select=Kontor`,
+                SPHttpClient.configurations.v1,
+                this._spHttpOptions.getMetaData).then((respone: SPHttpClientResponse): Promise<any> =>{
+                return respone.json();
+                }).then((item: any) =>{
+                resolve(item.value);
+                }).catch((error) =>{
+                reject(error);
+                });
+            })
+            return promise;
+        });
+        
+
+    }
     public getProjectTypeOptions():Promise<IOptions[]>{ 
         const promise: Promise<IOptions[]> = new Promise<IOptions[]>((resolve, reject)=>{       
             const selectQuery = '?$select=Title,Id';
-            this.client.get(`${this._siteUrl}${PROJECTTYPE_LIST_API_ENDPOINT}/items${selectQuery}`,
+            this._spHttpClient.get(`${this._siteUrl}${PROJECTTYPE_LIST_API_ENDPOINT}/items${selectQuery}`,
             SPHttpClient.configurations.v1,
             this._spHttpOptions.getMetaData
             ).then((respone: SPHttpClientResponse): Promise<{value: IOptions[]}> =>{
@@ -82,7 +112,7 @@ const PROJECTTYPE_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Proje
 
     private getItemEntityType(): Promise<string> {
         const promise: Promise<string> = new Promise<string>((resolve, reject) => {
-            this.client.get(`${this._siteUrl}${PROJECT_LIST_API_ENDPOINT}?$select=ListItemEntityTypeFullName`,
+            this._spHttpClient.get(`${this._siteUrl}${PROJECT_LIST_API_ENDPOINT}?$select=ListItemEntityTypeFullName`,
                 SPHttpClient.configurations.v1,
                 this._spHttpOptions.getNoMetaData
             )
@@ -108,7 +138,7 @@ const PROJECTTYPE_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Proje
             requestDetails.body = JSON.stringify(
                 newItem
             );
-            this.client.post(
+            this._spHttpClient.post(
                 queryUrl,
                 SPHttpClient.configurations.v1,
                 requestDetails

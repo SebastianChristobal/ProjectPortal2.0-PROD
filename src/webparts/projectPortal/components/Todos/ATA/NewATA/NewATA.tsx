@@ -24,9 +24,9 @@ import {
   Label
  } from "office-ui-fabric-react";
 import { INewATAProps } from "./INewATAProps";
-import styles from "../ProjectPortal.module.scss";
-import { IProject } from "../Models";
-import { IATA } from "../Models/IATA";
+import styles from "../../../ProjectPortal.module.scss";
+import { IProject } from "../../../Models";
+import { IATA } from "../../../Models/IATA";
 
 const NewATA: React.FC<INewATAProps> = (props) =>{
   const sp = spfi().using(SPFx(props.context));

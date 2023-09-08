@@ -30,9 +30,9 @@ import {
 import {  Label } from "office-ui-fabric-react";
 //import { IIconProps } from '@fluentui/react/lib/Icon';
 import { ImageFit } from '@fluentui/react/lib/Image';
- import styles from '../ProjectPortal.module.scss';
+ import styles from '../../ProjectPortal.module.scss';
 import { IMyProjectsProps } from "./IMyProjectsProps";
-import { IProject } from "../Models";
+import { IProject } from "../../Models";
 //import { ProjectService } from '../services/';
 
 const MyProject: React.FC<IMyProjectsProps> = (props) =>{
@@ -76,7 +76,7 @@ const MyProject: React.FC<IMyProjectsProps> = (props) =>{
                   'ProjectImage',
                   'Status'
                   ).expand('ProjectManager', 'ProjectLeader', 'ProjectType', 'ProjectMembers').orderBy('Modified', true).getAll();
-                const myProjects = items.map((projects: IProject) => ({  
+                const myProjects = items.map((projects: any) => ({  
                     Id: projects.Id, 
                     Title: projects.Title,
                     Customer: projects.Customer,
@@ -86,12 +86,12 @@ const MyProject: React.FC<IMyProjectsProps> = (props) =>{
                     ProjectImage: projects.ProjectImage,
                     Status: projects.Status,
                     ProjectType: projects.ProjectType
-                }));
-                myProjects.filter((project: IProject) =>
-                project.ProjectLeader.ID === currentUser.Id ||
-                project.ProjectManager.ID.includes(currentUser.Id) ||
-                project.ProjectMembers.ID.includes(currentUser.Id) 
-                );
+                })).filter(item => 
+                  item.ProjectLeader.ID === currentUser.Id || 
+                  item.ProjectManager.ID === currentUser.Id || 
+                  item.ProjectMembers.some((member: any) => member.ID === currentUser.Id)
+                 );
+
                 setmyProjects(myProjects);
                 }
               catch (error) {

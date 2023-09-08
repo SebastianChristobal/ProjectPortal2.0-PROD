@@ -22,20 +22,20 @@ import {
   // IPivotStyles,
 } from "office-ui-fabric-react";
 import { spfi, SPFx } from "@pnp/sp";
-import styles from "../Todos.module.scss";
+import styles from "../../Activities.module.scss";
 import {
   PrimaryButton,
   // Label,
   // DefaultButton
 } from "office-ui-fabric-react";
-import { IATA } from "../../Models/IATA";
+import { IATA } from "../../../Models/IATA";
 
 const ATA: React.FC<IATAProps> = (props) =>{
 
     const sp = spfi().using(SPFx(props.context));
     const [ongoingATA, setOngoingATA] = useState([]);
     const [completedATA, setCompletedATA] = useState([]);
-    const [selectedATAItem, setSelectedATAItem] =useState<IATA>({});
+    // const [selectedATAItem, setSelectedATAItem] =useState<IATA>({});
     const [updateListItems, setUpdateListItems] = useState(null);
 
     const onUpdateATADone = (ata: IATA): void => {
@@ -57,9 +57,9 @@ const ATA: React.FC<IATAProps> = (props) =>{
         });
       };
 
-      const getSelectedATAItem = (selectedItem: IATA): void => {
-        setSelectedATAItem(selectedItem);
-      };
+      // const getSelectedATAItem = (selectedItem: IATA): void => {
+      //   setSelectedATAItem(selectedItem);
+      // };
     
       useEffect(() => {
         const fetchControlPointsData = async (): Promise<any> => {
@@ -113,7 +113,7 @@ const ATA: React.FC<IATAProps> = (props) =>{
         });
       }, [updateListItems]);
       
-      console.log(selectedATAItem);
+      // console.log(selectedATAItem);
 
   const renderOngoingATA = (): JSX.Element => {
 
@@ -132,7 +132,7 @@ const ATA: React.FC<IATAProps> = (props) =>{
        // onClick={() => this.onOpenPanelHandler(items)}
         style={{
           maxWidth: '100%',
-          height: '100%',
+          height: 'auto',
           marginTop: '15px',
           padding: '5px'
         }}
@@ -157,7 +157,7 @@ const ATA: React.FC<IATAProps> = (props) =>{
                 }}
                 disabled={false}
                 text={onShowButtonText}
-                onClick={() => getSelectedATAItem(items)}
+                // onClick={() => getSelectedATAItem(items)}
               />
         </div>
         </DocumentCardDetails>
@@ -208,7 +208,7 @@ const ATA: React.FC<IATAProps> = (props) =>{
                   }}
                   disabled={false}
                   text={onShowButtonText}
-                  onClick={() => getSelectedATAItem(items)}
+                  // onClick={() => getSelectedATAItem(items)}
                 />
           </div>
           </DocumentCardDetails>

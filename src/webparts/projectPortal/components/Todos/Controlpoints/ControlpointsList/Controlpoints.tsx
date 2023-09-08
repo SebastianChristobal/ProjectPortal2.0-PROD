@@ -22,14 +22,14 @@ import {
   // IPivotStyles,
 } from "office-ui-fabric-react";
 import { spfi, SPFx } from "@pnp/sp";
-import styles from "../Todos.module.scss";
+import styles from "../../Activities.module.scss";
 import * as moment from "moment";
 import {
   PrimaryButton,
   // Label,
   // DefaultButton
 } from "office-ui-fabric-react";
-import { IControlPoints } from "../../Models/IControlPoints";
+import { IControlPoints } from "../../../Models/IControlPoints";
 const ControlPoints: React.FC<IControlPointsProps> = (props) => {
   const sp = spfi().using(SPFx(props.context));
   const [ongoingControlpoints, setOngoingControlpoints] = useState([]);
@@ -133,7 +133,7 @@ const ControlPoints: React.FC<IControlPointsProps> = (props) => {
        // onClick={() => this.onOpenPanelHandler(items)}
         style={{
           maxWidth: '100%',
-          height: '100%',
+          height: 'auto',
           marginTop: '15px',
           padding: '5px'
         }}

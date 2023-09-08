@@ -15,13 +15,13 @@ import {
     PivotLinkSize
 } from  'office-ui-fabric-react';
 import { Image, IImageProps } from '@fluentui/react/lib/Image';
-import NewProject from './NewProject/NewProject';
+import NewProject from './Projects/NewProject/NewProject';
 import Start from './Start/Start';
-import ProjectDetail from './MyProjects/ProjectDetails/ProjectDetail';
-import NewATA from './NewATA/NewATA';
-import NewControlPoint from './NewControlPoint/NewControlPoint';
-import AllProjects from './AllProjects/AllProjects';
-import NewActivity from './NewActivity/NewActivity';
+import ProjectDetail from './Projects/ProjectDetails/ProjectDetail';
+import NewATA from './Todos/ATA/NewATA/NewATA';
+import NewControlPoint from './Todos/Controlpoints/NewControlPoint/NewControlPoint';
+import AllProjects from './Projects/AllProjects/AllProjects';
+import NewTodo from './Todos/ActivityControlpoints/NewTodo/NewTodo';
 
 const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps) =>{
   const {SPHttpClient, context, siteAbsolutetUrl} = props;
@@ -113,7 +113,7 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
         <NewControlPoint {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
             <Route path={'/registreraAktivitet/'} render={(props: any) =>
-        <NewActivity {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
+        <NewTodo {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />
         } />
       <Route path={'/ProjektDetaljer/:id'} render={(props: any) =>
         <ProjectDetail {...props} spHttpClient={SPHttpClient} spSiteUrl={siteAbsolutetUrl} context={context}  />

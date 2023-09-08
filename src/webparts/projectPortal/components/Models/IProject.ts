@@ -1,7 +1,7 @@
 export interface IProject{
     Id?: string;
     Title?: string;
-    ProjectType?: string;
+    ProjectType?: any;
     ProjectTypeId?: number;
     ProjectLeader?:any;
     ProjectLeaderId?: any;
@@ -12,4 +12,5 @@ export interface IProject{
     Customer?: string;
     ProjectImage?: string;
     Status?: string;
+    AbsoluteSiteUrl?: string;
 }

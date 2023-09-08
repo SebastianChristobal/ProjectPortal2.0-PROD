@@ -2,8 +2,8 @@ import * as React from "react";
 import { IStartProps } from "./IStartProps";
 import { Label } from "office-ui-fabric-react";
 import styles from "../ProjectPortal.module.scss";
-import MyProject from "../MyProjects/MyProjects";
-import Todos from "../Todos/Todos";
+import MyProject from "../Projects/MyProjects/MyProjects";
+import Todos from "../Todos/Activities";
 
 const Start : React.FC<IStartProps> = (props: IStartProps) =>{
     return(<React.Fragment>

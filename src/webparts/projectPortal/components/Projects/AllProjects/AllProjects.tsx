@@ -33,7 +33,7 @@ import {
     Label
    } from "office-ui-fabric-react";
 import styles from "./AllProjects.module.scss";
-import { IProject } from "../Models";
+import { IProject } from "../../Models";
 import { IAllProjectsProps } from './IAllProjectsProps';
 
 const pivotStyles: Partial<IPivotStyles> = {
@@ -202,7 +202,7 @@ const AllProjects : React.FC<IAllProjectsProps> = (props) =>{
                     <Label
                     style={{fontSize:18, fontWeight: 400}}
                     >
-                    Använd formuläret nedan för att registrera en ändring, tillägg och avgående.
+                    {/* Använd formuläret nedan för att registrera en ändring, tillägg och avgående. */}
                     </Label>
                 </div>
             </div>
@@ -235,18 +235,9 @@ const AllProjects : React.FC<IAllProjectsProps> = (props) =>{
               </div>
              </PivotItem>
       </Pivot>
-       
-            </div>
-            <div className={styles.allProjectsInfoText}>
-                <Label
-                 style={{fontSize:18, fontWeight: 400}}
-                >
-               Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.
-                </Label>
-            </div>
-        </div>
-        </React.Fragment>)
-
+      </div>
+     </div>
+    </React.Fragment>)
 }
 
 

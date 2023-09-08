@@ -19,6 +19,9 @@ import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";  
 import "@pnp/sp/fields";
+// import { IItem } from "@pnp/sp/items";
+import "@pnp/sp/lists/web";
+import "@pnp/sp/attachments";
 import { IItemAddResult } from "@pnp/sp/items";
 import { spfi, SPFx } from "@pnp/sp";
 import { TextField } from '@fluentui/react/lib/TextField';
@@ -27,10 +30,13 @@ import {
   Label,
   DatePicker
  } from "office-ui-fabric-react";
+//  import { FileAddResult } from '@pnp/sp/files';
+// import { Web } from '@pnp/sp/webs';
+// import { spSetup } from '@pnp/sp-clientsvc';
 import { INewControlPointProps } from "./INewControlPointProps";
-import styles from "../ProjectPortal.module.scss";
-import { IControlPoints } from "../Models/IControlPoints";
-import { IProject, IUser } from "../Models";
+import styles from "../../../ProjectPortal.module.scss";
+import { IControlPoints } from "../../../Models/IControlPoints";
+import { IProject, IUser } from "../../../Models";
 
 const NewControlPoint: React.FC<INewControlPointProps> = (props) =>{
   const sp = spfi().using(SPFx(props.context));
@@ -44,6 +50,7 @@ const NewControlPoint: React.FC<INewControlPointProps> = (props) =>{
   const [projectDropdownOptions, setProjectDropdownOptions] = useState<IDropdownOption[]>([]);
   const [controlTypeOptions, setControlTypeOptions] = useState<IDropdownOption[]>([]);
   const [implementedBy, setImplementedBy] = useState([]);
+   const [selectedFiles, setSelectedFiles] = useState([]);
   const _getImplementedBy = (props: IUser[]): void => {  setImplementedBy(props);}
 
 const _onProjectOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
@@ -62,6 +69,41 @@ const _onDescTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTe
 const _onDateChange = (date: Date | null | undefined):void => {
   setSelectedDateValue(date);
 }
+const handleFileChange = (event: any): void => {
+  setSelectedFiles([...event.target.files]);
+};
+
+// const handleUpload = () => {
+//   if (selectedFiles.length > 0) {
+//     uploadFiles(selectedFiles);
+//   }
+// };
+
+// const uploadFiles = async (files: any) => {
+//   const siteUrl = 'https://your-sharepoint-site-url';
+//     sp.setup({
+//       sp: {
+//         baseUrl: siteUrl,
+//       },
+//     });
+//     spSetup({
+//       sp: {
+//         baseUrl: siteUrl,
+//       },
+//     });
+//   try {
+//     const web = Web(siteUrl);
+
+//     for (const file of files) {
+//       const fileAddResult: FileAddResult = await web.getFolderByServerRelativeUrl('/your-library-name')
+//         .files.add(file.name, file, true);
+
+//       console.log(`File '${file.name}' uploaded successfully. ID: ${fileAddResult.data.Id}`);
+//     }
+//   } catch (error) {
+//     console.error('Error uploading files:', error);
+//   }
+// };
 
 const onSaveControlPoint = async (): Promise<any>  => {
   const implementedByUser = implementedBy.map((items: IUser) =>{return items.id})[0];
@@ -86,8 +128,7 @@ const onSaveControlPoint = async (): Promise<any>  => {
       }
   catch(error){
       console.error(error);
-      } 
-     
+      }    
 }
 
 useEffect(() => {
@@ -132,7 +173,7 @@ useEffect(() => {
     // });
   }, []); 
 
-
+  console.log(selectedFiles);
   return(<React.Fragment>
     <div className={styles.newProjectWrapper}>
         <div className={styles.newProjectTopNav}>
@@ -203,6 +244,8 @@ useEffect(() => {
                
               resolveDelay={1000} 
              />
+              <input type="file" multiple onChange={handleFileChange} />
+              <button >Upload Files</button>
              <div className={styles.buttonWrapper}>
                 <PrimaryButton 
                 disabled={

@@ -11,9 +11,9 @@ import {
   // DefaultButton
 } from "office-ui-fabric-react";
 import { TodosProps } from "./TodosProps";
-import Activity from "./ActivityList/Activity";
-import ControlPoints from "./ControlpointsList/Controlpoints";
-import ATA from "./ATAList/ATA";
+import Todos from "./ActivityControlpoints/TodosList/Todos";
+import ControlPoints from "./Controlpoints/ControlpointsList/Controlpoints";
+import ATA from "./ATA/ATAList/ATA";
 
 const pivotStyles: Partial<IPivotStyles> = {
   // root: {
@@ -40,7 +40,7 @@ const pivotStyles: Partial<IPivotStyles> = {
   },
 };
 
-const Todos: React.FC<TodosProps> = (props) => {
+const Activities: React.FC<TodosProps> = (props) => {
   return (
     <React.Fragment>
       <Label style={{ fontSize: 20, fontWeight: 500, marginBottom: 10 }}>
@@ -61,7 +61,7 @@ const Todos: React.FC<TodosProps> = (props) => {
               marginTop: 6,
             }}
           >
-            {<Activity {...props} />}
+            {<Todos {...props} />}
           </div>
         </PivotItem>
         <PivotItem headerText="Mina Kontrollpunkter" itemKey="myControlPoints">
@@ -90,4 +90,4 @@ const Todos: React.FC<TodosProps> = (props) => {
     </React.Fragment>
   );
 };
-export default Todos;
+export default Activities;

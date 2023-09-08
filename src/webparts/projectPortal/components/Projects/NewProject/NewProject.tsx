@@ -28,8 +28,8 @@ import {
     PrimaryButton,
     Label 
 } from "office-ui-fabric-react";
-import styles from "../ProjectPortal.module.scss";
-import { IProject, IUser } from "../Models";
+import styles from "../../ProjectPortal.module.scss";
+import { IProject, IUser } from "../../Models";
 
 const NewProject: React.FC<INewProjectProps> = (props) =>{
     const sp = spfi().using(SPFx(props.context));
@@ -67,7 +67,7 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
         const selectedProjectManager = await sp.web.ensureUser(projectManagerUser);
         const selectedResponsibleManager = await sp.web.ensureUser(responsibleManagerUser);
        
-        const project: IProject = {
+         const project: IProject = {
             Title: titleValue,
             Customer: customerValue,
             ProjectTypeId: optValue,

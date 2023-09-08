@@ -1,6 +1,6 @@
 import { SPHttpClient } from "@microsoft/sp-http";
 
-export interface IActivityProps{
+export interface ITodosProps{
     SPHttpClient?: SPHttpClient;
     siteAbsolutetUrl?: string;
     context?: any; 

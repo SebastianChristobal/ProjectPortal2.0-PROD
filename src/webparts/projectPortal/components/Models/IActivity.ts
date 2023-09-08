@@ -10,5 +10,6 @@ export interface IActivity{
     Description?: string;
     Responsible?: any;
     ResponsibleId?: any; 
-    DueDate?: Date;
+    DueDate1?: any;
+    ContentType?: any;
 }

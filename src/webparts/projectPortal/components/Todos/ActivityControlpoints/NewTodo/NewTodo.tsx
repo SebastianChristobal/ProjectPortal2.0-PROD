@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { INewActivityProps } from './INewActivtyProps';
+import { INewTodoProps } from './INewTodoProps';
 import { 
     useState, 
     useEffect 
@@ -22,19 +22,19 @@ import {
  import "@pnp/sp/fields";
  import { IItemAddResult } from "@pnp/sp/items";
  import { spfi, SPFx } from "@pnp/sp";
- import styles from "../ProjectPortal.module.scss";
+ import styles from "../../../ProjectPortal.module.scss";
  import { TextField } from '@fluentui/react/lib/TextField';
  import { 
   PrimaryButton, 
   Label,
   DatePicker
  } from "office-ui-fabric-react";
-import { IProject, IUser } from '../Models';
-import { IActivity } from '../Models/IActivity';
+import { IProject, IUser } from '../../../Models';
+import { IActivity } from '../../../Models/IActivity';
 
 
 
-const NewActivity: React.FC<INewActivityProps> = (props) =>{
+const NewTodo: React.FC<INewTodoProps> = (props) =>{
     const sp = spfi().using(SPFx(props.context));
 
    const [titleValue, setTitleValue] = useState<string>('');   
@@ -46,6 +46,7 @@ const NewActivity: React.FC<INewActivityProps> = (props) =>{
    const [manager, setManager] = useState([]);
    const _getManager= (props: IUser[]): void => {  setManager(props);}
 
+  
    const _onProjectOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
     setProjectOptionsValue(option.key);
   }
@@ -67,7 +68,7 @@ const NewActivity: React.FC<INewActivityProps> = (props) =>{
         ResponsibleId: selectedUser.data.Id,
         ProjektId: projectOptionsValue,
         Description: descValue,
-        DueDate: selectedDateValue,
+        DueDate1: selectedDateValue,
     }
     try{
          const iar: IItemAddResult = await sp.web.lists.getByTitle("Activity").items.add(activities);
@@ -189,4 +190,4 @@ return(<React.Fragment>
 
 
 
-export default NewActivity;
+export default NewTodo;
