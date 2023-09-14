@@ -76,7 +76,7 @@ const PROJECTTYPE_LIST_API_ENDPOINT: string = `/_api/web/lists/GetByTitle('Proje
         const promise: Promise<any> =  new  Promise<any>((resolve, reject) =>{
             if(projects )
             projects.map((project: any) =>{
-                const listsUrl = `${project.AbsoluteSiteUrl}/_api/web/lists/getbytitle('Todos')/items?$select=*,ContentType/Name&$expand=ContentType`;
+                const listsUrl = `${project.AbsoluteSiteUrl}/_api/web/lists/getbytitle('Acitivties')/items?$select=*,ContentType/Name&$expand=ContentType`;
                 this._spHttpClient.get(`${listsUrl}`,
                 // this.client.get(`https://karriarkonsulten.sharepoint.com/${LIST_API_ENDPOINT}/items?$select=Kontor`,
                 SPHttpClient.configurations.v1,

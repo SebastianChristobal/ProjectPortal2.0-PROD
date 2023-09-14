@@ -12,5 +12,6 @@ export interface IProject{
     Customer?: string;
     ProjectImage?: string;
     Status?: string;
+    ContentType?: any;
     AbsoluteSiteUrl?: string;
 }

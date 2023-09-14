@@ -1,9 +1,12 @@
 import * as React from "react";
 import { IStartProps } from "./IStartProps";
-import { Label } from "office-ui-fabric-react";
+import { Label, PrimaryButton } from "office-ui-fabric-react";
 import styles from "../ProjectPortal.module.scss";
 import MyProject from "../Projects/MyProjects/MyProjects";
-import Todos from "../Todos/Activities";
+import Activities from "../Todos/Activities";
+import { IIconProps } from '@fluentui/react';
+
+const addIcon: IIconProps = { iconName: 'Add' };
 
 const Start : React.FC<IStartProps> = (props: IStartProps) =>{
     return(<React.Fragment>
@@ -21,6 +24,9 @@ const Start : React.FC<IStartProps> = (props: IStartProps) =>{
                 >
                     Här kan du se vilka projekt du är ägare av eller medlem i, du kan även se dina aktiviteter kopplade till projekten.
                </Label>
+               <div style={{float:'right'}}>
+                <PrimaryButton text="Nytt projekt" iconProps={addIcon} />
+               </div>
             </div>
         </div>
         <div className={styles.projectActivityWrapper}>
@@ -28,7 +34,7 @@ const Start : React.FC<IStartProps> = (props: IStartProps) =>{
             <MyProject {...props} />
         </div>
         <div className={styles.myActivitiesColumn}>
-            <Todos {...props} />
+            <Activities {...props} />
         </div>
         </div>
     </div></React.Fragment>);

@@ -10,9 +10,9 @@ import {
   Label,
   // DefaultButton
 } from "office-ui-fabric-react";
-import { TodosProps } from "./TodosProps";
+import { ActivitiesProps } from "./ActivitiesProps";
 import Todos from "./ActivityControlpoints/TodosList/Todos";
-import ControlPoints from "./Controlpoints/ControlpointsList/Controlpoints";
+//import ControlPoints from "./Controlpoints/ControlpointsList/Controlpoints";
 import ATA from "./ATA/ATAList/ATA";
 
 const pivotStyles: Partial<IPivotStyles> = {
@@ -40,7 +40,7 @@ const pivotStyles: Partial<IPivotStyles> = {
   },
 };
 
-const Activities: React.FC<TodosProps> = (props) => {
+const Activities: React.FC<ActivitiesProps> = (props) => {
   return (
     <React.Fragment>
       <Label style={{ fontSize: 20, fontWeight: 500, marginBottom: 10 }}>
@@ -60,11 +60,12 @@ const Activities: React.FC<TodosProps> = (props) => {
               padding: 20,
               marginTop: 6,
             }}
+          
           >
             {<Todos {...props} />}
           </div>
         </PivotItem>
-        <PivotItem headerText="Mina Kontrollpunkter" itemKey="myControlPoints">
+        {/* <PivotItem headerText="Mina Kontrollpunkter" itemKey="myControlPoints">
           <div
             style={{
               boxShadow: "rgba(0, 0, 0, 0.4) 0px 0px 5px 0px",
@@ -74,7 +75,7 @@ const Activities: React.FC<TodosProps> = (props) => {
           >
             {<ControlPoints {...props} />}
           </div>
-        </PivotItem>
+        </PivotItem> */}
         <PivotItem headerText="Mina ÄTA" itemKey="myATA">
           <div
             style={{

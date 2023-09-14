@@ -4,7 +4,7 @@ import {
   useEffect,  
   //useReducer  
   } 
-    from "react";
+from "react";
 import {
     DocumentCard,
     DocumentCardDetails,
@@ -22,7 +22,8 @@ import "@pnp/graph/sites/group";
 import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";
- import { Web } from "@pnp/sp/webs";   
+import { Web } from "@pnp/sp/webs";   
+import { spfi, SPFx } from "@pnp/sp";
 import {
   Pivot,
   PivotItem,
@@ -31,7 +32,7 @@ import {
   // IPivotStyles,
 } from "office-ui-fabric-react";
  //import { graphfi, SPFx as graphSPFx } from "@pnp/graph";
- import { spfi, SPFx } from "@pnp/sp";
+
  //import * as moment from "moment";
 import {
   PrimaryButton,
@@ -77,21 +78,21 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
 
 
  const onActivityDone = (activity: IActivity, project: IProject): void => {
+  const web = Web(project.AbsoluteSiteUrl).using(SPFx(props.context));
+  const updatedData = {
+      isDone: true,
+      // Add other properties you want to update
+    };
     const upDateData = async (): Promise<any> => {
       try {
-        const web =  Web(project.AbsoluteSiteUrl);
-        const updatedData = {
-          isDone: true,
-          // Add other properties you want to update
-        };
-        
-        const response = await web.lists.getByTitle('Todos').items.getById(activity.Id).update(updatedData);
-        console.log('Item updated successfully:', response);
+        await web.lists.getByTitle('Activities').items.getById(activity.Id).update(updatedData);
+        console.log('Item updated successfully:');  
         // Refresh your data or UI if needed
       } catch (error) {
         console.error(`Error processing update:`, error);
       }
     };
+    
     setUpdateListItems(true);
     upDateData().catch((err) => {
       console.error(err);
@@ -104,6 +105,7 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
 
   const fetchActivities = async (): Promise<any> =>{
       const currentUser = await sp.web.currentUser();
+      setUpdateListItems(false);
       const items = await sp.web.lists.getByTitle("Projekt").items.select(
         'Id',    
         'Title', 
@@ -137,11 +139,10 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
         item.ProjectMembers.some((member: any) => member.ID === currentUser.Id)
        );
     setCurrentUserProjects(myProjects);
-
     await Promise.all(myProjects.map(async (project: any) => {
       try {
         // Construct the full SharePoint REST API URL for lists
-        const listsUrl = `${project.AbsoluteSiteUrl}/_api/web/lists/getbytitle('Todos')/items?$select=*,ContentType/Name&$expand=ContentType`;
+        const listsUrl = `${project.AbsoluteSiteUrl}/_api/web/lists/getbytitle('Activities')/items?$select=*,ContentType/Name&$expand=ContentType`;
     
         // Fetch lists using SharePoint REST API
         const response = await fetch(listsUrl, {
@@ -168,7 +169,7 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
       console.error(err);
   });
   
-  }, [])
+  }, [updateListItems])
   // useEffect(() => {
   //   const fetchActivityData = async (): Promise<any> => {
   //     try {
@@ -225,10 +226,10 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
   const renderOngoingActivities = (): JSX.Element =>{
     const activity: any = ongoingActivities.length > 0 ? ongoingActivities.map((items: any) =>{
     const project : any = currentUserProjects.length > 0 ? currentUserProjects.map((project: any) =>{
-
-    if(items.ContentType.Name === 'Activity' && items.isDone !== true){
+    const activityTypeName = items.ContentType.Name === 'Controlpoint' ? 'Kontrollpunkt': 'Aktivitet';
+    if( items.isDone !== true ){
           const activityTitle = `Rubrik: ${items.Title}`;
-          const activityContentTypeName= `Typ: ${items.ContentType.Name}`;
+          const activityContentTypeName= `Typ: ${activityTypeName}`
           const activityProject = `Projekt: ${project.Title}`;
           // const activityDueDate = `Förfallodatum: ${items.DueDate1 !== undefined ? items.DueDate1 : ''}`;
           const onShowButtonText = "Visa";
@@ -277,6 +278,60 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
     return activity;
   }
 
+  const renderCompletedActivities = (): JSX.Element =>{
+    const activity: any = ongoingActivities.length > 0 ? ongoingActivities.map((items: any) =>{
+    const project : any = currentUserProjects.length > 0 ? currentUserProjects.map((project: any) =>{
+    const activityTypeName = items.ContentType.Name === 'Controlpoint' ? 'Kontrollpunkt': 'Aktivitet';
+    if( items.isDone === true ){
+          const activityTitle = `Rubrik: ${items.Title}`;
+          const activityContentTypeName= `Typ: ${activityTypeName}`;
+          const activityProject = `Projekt: ${project.Title}`;
+          // const activityDueDate = `Förfallodatum: ${items.DueDate1 !== undefined ? items.DueDate1 : ''}`;
+          const onShowButtonText = "Visa";
+          const buttonText = "Klarmarkerad";
+            return(<DocumentCard
+            key={items.Id}
+            type={DocumentCardType.compact}
+           // onClick={() => this.onOpenPanelHandler(items)}
+            style={{
+              maxWidth: '100%',
+              height: 'auto',
+              marginTop: '15px',
+              padding: '5px'
+            }}
+          >
+            <DocumentCardDetails>        
+            <DocumentCardTitle title={activityTitle} className={styles.cardTitle} />
+            <span key={items.Id} className={styles.cardItemProperties}>{activityProject}</span>
+            <span key={items.Id} className={styles.cardItemProperties}>{activityContentTypeName}</span>
+            {/* <span key={items.Id} className={styles.cardItemProperties}>{activityManager}</span> */}
+            {/* <span key={items.Id} className={styles.cardItemProperties}>{activityDueDate}</span> */}
+            {/* <span key={items.Id} className={styles.cardItemProperties}>{activityDescription}</span> */}
+            <div style={{paddingLeft: '10px', paddingTop:'5px'}}>
+            <PrimaryButton
+                    disabled={items.isDone}
+                    text={buttonText}
+                    onClick={() => onActivityDone(items, project)}
+                  />
+                  <PrimaryButton
+                    style={{
+                      width: "119px",
+                      marginTop: "5px",
+                      marginLeft: '5px'
+                    }}
+                    disabled={false}
+                    text={onShowButtonText}
+                    // onClick={() => getSelectedActivityItem(items)}
+                  />
+            </div>
+            </DocumentCardDetails>
+          </DocumentCard>)
+        }       
+      }) : null;
+      return project;
+    }): null;
+    return activity;
+  }
   // const renderCompletedActivities = (): JSX.Element =>{
   //   const activity: any = completedActivities.length > 0 ? completedActivities.map((items: IActivity) =>{
   //     const activityTitle = `Rubrik: ${items.Title}`;
@@ -356,7 +411,7 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
               marginTop: 6,
             }}
           >
-            {/* { renderCompletedActivities() } */}
+            { renderCompletedActivities() }
           </div>
         </PivotItem>
       </Pivot>

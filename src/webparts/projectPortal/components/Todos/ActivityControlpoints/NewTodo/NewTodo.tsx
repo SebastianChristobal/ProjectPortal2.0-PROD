@@ -20,8 +20,9 @@ import {
  import "@pnp/sp/site-users/web";
  import "@pnp/sp/profiles";  
  import "@pnp/sp/fields";
- import { IItemAddResult } from "@pnp/sp/items";
+ import { Web } from "@pnp/sp/webs";  
  import { spfi, SPFx } from "@pnp/sp";
+ import { IItemAddResult } from "@pnp/sp/items";
  import styles from "../../../ProjectPortal.module.scss";
  import { TextField } from '@fluentui/react/lib/TextField';
  import { 
@@ -40,15 +41,25 @@ const NewTodo: React.FC<INewTodoProps> = (props) =>{
    const [titleValue, setTitleValue] = useState<string>('');   
    const [descValue, setdescValue] = useState<string>('');  
    const [selectedDateValue, setSelectedDateValue] = useState<Date>(null);
+   const [selectedProjectWebUrl, setSelectedProjectWebUrl] = useState<string>('');
+   const [selectedProjectContentTypeId, setSelectedProjectContentTypeId] = useState<string>('');
+  // const [absoluteSiteUrl: setAbsoluteSiteUrl] = useState<string>('');
 //   const [priceValue, setPriceValue] = useState<string>(''); 
    const [projectOptionsValue, setProjectOptionsValue] = useState<any>(null);
-   const [dropdownOptions, setDropdownOptions] = useState<IDropdownOption[]>([]);
+   const [activityOptionsValue, setActivityOptionsValue] = useState<any>(null);
+   const [options, setOptions] = useState<IDropdownOption[]>([]);
+   const [activityOptions, setActivityOptions] = useState<IDropdownOption[]>([]);
    const [manager, setManager] = useState([]);
    const _getManager= (props: IUser[]): void => {  setManager(props);}
 
-  
-   const _onProjectOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
+   const _onProjectOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: any, index?: number): void => {
     setProjectOptionsValue(option.key);
+    setSelectedProjectWebUrl(option.webUrl);
+    
+  }
+  const onActivityChangeHandler = (event: React.FormEvent<HTMLDivElement>, option?: any, index?: number): void => {
+    setActivityOptionsValue(option.key);
+    setSelectedProjectContentTypeId(option.contentTypeId);
   }
    const _onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
     setTitleValue(newValue);
@@ -61,17 +72,20 @@ const NewTodo: React.FC<INewTodoProps> = (props) =>{
   }
 
   const onSaveActivty = async (): Promise<any>  => {
+    const web = Web(selectedProjectWebUrl);
     const selectedManager = manager.map((items: IUser) =>{return items.id})[0];
-    const selectedUser = await sp.web.ensureUser(selectedManager);
+    const selectedUser = await web.ensureUser(selectedManager);
+    const contentTypeId = selectedProjectContentTypeId;
     const activities: IActivity = {
         Title: titleValue,
         ResponsibleId: selectedUser.data.Id,
         ProjektId: projectOptionsValue,
         Description: descValue,
         DueDate1: selectedDateValue,
+        ContentType: contentTypeId
     }
     try{
-         const iar: IItemAddResult = await sp.web.lists.getByTitle("Activity").items.add(activities);
+         const iar: IItemAddResult = await web.lists.getByTitle("Activities").items.add(activities);
          setTitleValue('');
          setdescValue('');
          setSelectedDateValue(null);
@@ -84,25 +98,83 @@ const NewTodo: React.FC<INewTodoProps> = (props) =>{
         } 
      
   }
+  const fetchProjects = async (): Promise<any> => {
+    const currentUser = await sp.web.currentUser();
+    try {
+      const items = await sp.web.lists.getByTitle("Projekt").items.select(
+        'Id',    
+        'Title', 
+        'ProjectType/Title',
+        'ProjectType/ID',
+        'Customer',
+        'ProjectManager/Title',
+        'ProjectMembers/Title',
+        'ProjectMembers/ID',
+        'ProjectManager/ID',
+        'ProjectLeader/Title',
+        'ProjectLeader/ID',
+        'ProjectImage',
+        'absoluteSiteUrl',
+        'Status',
+        'ContentType/Id'
+        ).expand('ProjectManager', 'ProjectLeader', 'ProjectType', 'ProjectMembers', 'ContentType').orderBy('Modified', true).getAll();
+      const myProjects = items.map((projects: any) => ({  
+          Id: projects.Id, 
+          Title: projects.Title,
+          Customer: projects.Customer,
+          ProjectLeader: projects.ProjectLeader,
+          ProjectManager: projects.ProjectManager,
+          ProjectMembers: projects.ProjectMembers,
+          ProjectImage: projects.ProjectImage,
+          Status: projects.Status,
+          ProjectType: projects.ProjectType,
+          AbsoluteSiteUrl: projects.absoluteSiteUrl,
+          ContentType: projects.ContentType
+      })).filter(item => 
+        item.ProjectLeader.ID === currentUser.Id || 
+        item.ProjectManager.ID === currentUser.Id || 
+        item.ProjectMembers.some((member: any) => member.ID === currentUser.Id)
+       );
+       // const webUrl = items.filter(item => item.absoluteSiteUrl);  
+        const options = myProjects.map((project: IProject) => ({
+            key: project.Id,
+            text: project.Title,
+            webUrl: project.AbsoluteSiteUrl,
+            contentTypeId: project.ContentType.Id.StringValue
+        }));
+       
+        setOptions(options);
+        }
+        catch (error) {
+            console.error(error);
+        }
+};
+const fetchActivityTypes = async (webUrl: string):Promise<any> => {
+  const web: any = Web(webUrl);
+  try {
+    const items = await web.lists.getByTitle("Activities").items();
+    console.log(items);
+
+     // const webUrl = items.filter(item => item.absoluteSiteUrl);  
+      const activityOptions = items.map((options: IActivity) => ({
+          key: options.Id,
+          text: options.Title,
+          contentTypeId: options.ContentType.Id.StringValue
+      }));
+      setActivityOptions(activityOptions);
+      }
+      catch (error) {
+          console.error(error);
+      }
+}
+ 
 
    useEffect(() => {
-    const fetchProjectsAsOptions = async (): Promise<any> => {
-        try {
-            const items = await sp.web.lists.getByTitle("Projekt").items();
-            const dropdownOptions = items.map((project: IProject) => ({
-                key: project.Id,
-                text: project.Title
-            }));
-            setDropdownOptions(dropdownOptions);
-            }
-            catch (error) {
-                console.error(error);
-            }
-    };
-    fetchProjectsAsOptions().catch((err) => {
+    fetchProjects().catch((err) => {
         console.error(err);
     });
   }, []); 
+
 
 return(<React.Fragment>
     <div className={styles.newProjectWrapper}>
@@ -125,10 +197,19 @@ return(<React.Fragment>
          <Dropdown
             placeholder="Välj projekt"
             label="Projekt"
-            options={ dropdownOptions }
+            options={ options }
             onChange={ _onProjectOptionsChange }
             required={true}
             selectedKey={projectOptionsValue}
+            // onChange={dropdownOpt}
+          />
+          <Dropdown
+            placeholder="Välj aktivitetstyp"
+            label="activityType"
+            options={ activityOptions }
+            onChange={ onActivityChangeHandler }
+            required={true}
+            selectedKey={activityOptionsValue}
             // onChange={dropdownOpt}
           />
           <TextField 
