@@ -19,10 +19,13 @@ import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";  
 import "@pnp/sp/fields";
-// import { IItem } from "@pnp/sp/items";
+import "@pnp/sp/files";
+import "@pnp/sp/folders";
+//import { IItem } from "@pnp/sp/items";
 import "@pnp/sp/lists/web";
 import "@pnp/sp/attachments";
 import { IItemAddResult } from "@pnp/sp/items";
+//import { IFileAddResult } from "@pnp/sp/files";
 import { Web } from "@pnp/sp/webs";  
  import { spfi, SPFx } from "@pnp/sp";
 import { TextField } from '@fluentui/react/lib/TextField';
@@ -76,49 +79,49 @@ const _onDateChange = (date: Date | null | undefined):void => {
 const handleFileChange = (event: any): void => {
   setSelectedFiles([...event.target.files]);
 };
+const uploadFiles = async (files: any, selectedItemId: any): Promise<any> => {
+  const file = files.map((item: any) => {return item.name});
+  const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
+  const fileNamePath = encodeURI(file);
+  let result: any;
+// you can adjust this number to control what size files are uploaded in chunks
 
-// const handleUpload = () => {
+  try {
+    if (files.size <= 10485760) {
+      // small upload
+     // const item: IItem = web.lists.getByTitle("Activities").items.getById(1);
+     // await item.attachmentFiles.add(fileNamePath, "Here is my content");
+     // await web.lists.getByTitle("Activities").items.getById(1).attachmentFiles.add(fileNamePath,"My content" );
+      result = await web.lists.getByTitle("Activities").items.getById(selectedItemId).attachmentFiles.add(fileNamePath,"My content" );
+      console.log(result);
+  } else {
+      // large upload
+      result = await web.lists.getByTitle("Activities").items.getById(selectedItemId).attachmentFiles.add(fileNamePath,"My content" );
+  }
+  } catch (error) {
+    console.error('Error uploading files:', error);
+  }
+};
+// const handleUpload = (): Promise<any> => {
 //   if (selectedFiles.length > 0) {
-//     uploadFiles(selectedFiles);
+//    return uploadFiles(selectedFiles).catch((error) => {console.error(error);});
 //   }
 // };
 
-// const uploadFiles = async (files: any) => {
-//   const siteUrl = 'https://your-sharepoint-site-url';
-//     sp.setup({
-//       sp: {
-//         baseUrl: siteUrl,
-//       },
-//     });
-//     spSetup({
-//       sp: {
-//         baseUrl: siteUrl,
-//       },
-//     });
-//   try {
-//     const web = Web(siteUrl);
+// useEffect(() => {
+//   handleUpload().catch((err) => {
+//     console.error(err);
+// });
+// },[selectedFiles])
 
-//     for (const file of files) {
-//       const fileAddResult: FileAddResult = await web.getFolderByServerRelativeUrl('/your-library-name')
-//         .files.add(file.name, file, true);
-
-//       console.log(`File '${file.name}' uploaded successfully. ID: ${fileAddResult.data.Id}`);
-//     }
-//   } catch (error) {
-//     console.error('Error uploading files:', error);
-//   }
-// };
 const onSaveControlPoint = async (): Promise<any>  => {
   const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
   const implementedByUser = implementedBy.map((items: IUser) =>{return items.id})[0];
   const selectedUser = await sp.web.ensureUser(implementedByUser);
   const contentTypes : IContentType[] = await web.lists.getByTitle("Activities").items.select('ContentType/Id,ContentType/Name').expand('ContentType').getAll();
-  console.log(contentTypes);
-  console.log(selectedUser);
   const contentType = contentTypes.find(contentType => 
     contentType.ContentType.Name === 'Controlpoint'
   );
-  console.log(contentType.ContentType.Id.StringValue);
   const controlPoint: IControlPoints = {
     ContentTypeId: contentType.ContentType.Id.StringValue,
     Title: titleValue,
@@ -130,14 +133,18 @@ const onSaveControlPoint = async (): Promise<any>  => {
   //const contentTypeId = selectedProjectContentTypeId;
   try{
     const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
-    const iar: IItemAddResult = await web.lists.getByTitle("Activities").items.add(controlPoint);
+    const iar: IItemAddResult = await web.lists.getByTitle("Activities").items.add(controlPoint).then((result): Promise<any> =>{
+      console.log(result.data.Id);
+      return uploadFiles(selectedFiles, result.data.Id).catch((error) => {console.error(error);});
+    });
    setTitleValue('');
    setDescriptionValue('');
    setProjectOptionsValue(null);
    setSelectedDateValue(null);
    setOptControlTypeKey(null);
+   setSelectedFiles([]);
    setImplementedBy([]);
-    console.log(iar);
+   console.log(iar);
    }
 catch(error){
    console.error(error);
@@ -295,8 +302,18 @@ useEffect(() => {
                
               resolveDelay={1000} 
              />
-              <input type="file" multiple onChange={handleFileChange} />
-              <button >Upload Files</button>
+             <div style={{marginTop: '15px'}}>
+             <input type="file" multiple onChange={handleFileChange}
+                disabled={
+                  !titleValue || 
+                  !descriptionValue || 
+                  !projectOptionsValue || 
+                  !selectedDateValue || 
+                  !optControlTypeValue ||
+                  !implementedBy.map((items: IUser) =>{return items.id})[0] 
+                }
+             />
+             </div>
              <div className={styles.buttonWrapper}>
                 <PrimaryButton 
                 disabled={

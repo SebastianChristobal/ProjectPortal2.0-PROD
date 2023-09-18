@@ -24,6 +24,7 @@ import {
 import { spfi, SPFx } from "@pnp/sp";
 import styles from "../../Activities.module.scss";
 import * as moment from "moment";
+
 import {
   PrimaryButton,
   // Label,
@@ -89,7 +90,7 @@ const ControlPoints: React.FC<IControlPointsProps> = (props) => {
           Date: moment(control.Date).format("YYYY-MM-DD"),
           isDone: control.isDone,
           ImplementedBy: control.ImplementedBy.Title
-        })).filter(item => item.isDone !== true);
+        })).filter((item: any) => item.isDone !== true);
 
         const completedControlPoints = controlItems.map((control: any) => ({
           Id: control.Id,
@@ -100,7 +101,7 @@ const ControlPoints: React.FC<IControlPointsProps> = (props) => {
           Date: moment(control.Date).format("YYYY-MM-DD"),
           isDone: control.isDone,
           ImplementedBy: control.ImplementedBy.Title
-        })).filter(item => item.isDone === true);
+        })).filter((item: any) => item.isDone === true);
 
         setUpdateListItems(false);
         setOngoingControlpoints(ongoingControlPoints);

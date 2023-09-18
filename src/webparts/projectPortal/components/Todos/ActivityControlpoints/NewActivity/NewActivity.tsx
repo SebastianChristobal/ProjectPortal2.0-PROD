@@ -78,7 +78,6 @@ const NewActivity: React.FC<INewTodoProps> = (props) =>{
     const contentType = contentTypes.find(contentType => 
       contentType.ContentType.Name === 'Activity'
     );
-    console.log(contentType.ContentType.Id.StringValue);
     //const contentTypeId = selectedProjectContentTypeId;
     const activities: IActivity = {
         ContentTypeId: contentType.ContentType.Id.StringValue,

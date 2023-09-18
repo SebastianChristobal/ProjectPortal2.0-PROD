@@ -33,9 +33,9 @@ import { IATA } from "../../../Models/IATA";
 const ATA: React.FC<IATAProps> = (props) =>{
 
     const sp = spfi().using(SPFx(props.context));
-    const [ongoingATA, setOngoingATA] = useState([]);
-    const [completedATA, setCompletedATA] = useState([]);
+    const [ATA, setATA] = useState([]);
     // const [selectedATAItem, setSelectedATAItem] =useState<IATA>({});
+    const [currentUserProjects, setCurrentUserProjects] = useState([]);
     const [updateListItems, setUpdateListItems] = useState(null);
 
     const onUpdateATADone = (ata: IATA): void => {
@@ -60,55 +60,67 @@ const ATA: React.FC<IATAProps> = (props) =>{
       // const getSelectedATAItem = (selectedItem: IATA): void => {
       //   setSelectedATAItem(selectedItem);
       // };
-    
-      useEffect(() => {
-        const fetchControlPointsData = async (): Promise<any> => {
+      const fetchATA = async (): Promise<any> => {
+        const currentUser = await sp.web.currentUser();
+          const items = await sp.web.lists.getByTitle("Projekt").items.select(
+        'Id',    
+        'Title', 
+        'ProjectType/Title',
+        'ProjectType/ID',
+        'Customer',
+        'ProjectManager/Title',
+        'ProjectMembers/Title',
+        'ProjectMembers/ID',
+        'ProjectManager/ID',
+        'ProjectLeader/Title',
+        'ProjectLeader/ID',
+        'ProjectImage',
+        'absoluteSiteUrl',
+        'Status'
+        ).expand('ProjectManager', 'ProjectLeader', 'ProjectType', 'ProjectMembers').orderBy('Modified', true).getAll();
+      const myProjects = items.map((projects: any) => ({  
+          Id: projects.Id, 
+          Title: projects.Title,
+          Customer: projects.Customer,
+          ProjectLeader: projects.ProjectLeader,
+          ProjectManager: projects.ProjectManager,
+          ProjectMembers: projects.ProjectMembers,
+          ProjectImage: projects.ProjectImage,
+          Status: projects.Status,
+          ProjectType: projects.ProjectType,
+          AbsoluteSiteUrl: projects.absoluteSiteUrl
+      })).filter((item: any) => 
+        item.ProjectLeader.ID === currentUser.Id || 
+        item.ProjectManager.ID === currentUser.Id || 
+        item.ProjectMembers.some((member: any) => member.ID === currentUser.Id)
+       );
+        setCurrentUserProjects(myProjects);
+        await Promise.all(myProjects.map(async (project: any) => {
           try {
-            const controlItems = await sp.web.lists
-              .getByTitle("ATA")
-              .items.select(
-                "Id",
-                "Title",
-                "Projekt/Title",
-                "Projekt/ID",
-                "Customer",
-                "Extent",
-                "Price",
-                "isDone"
-
-              )
-              .expand("Projekt")
-              .orderBy("Modified", true)
-              .getAll();
-    
-            const ongoingATA = controlItems.map((ata: any) => ({
-              Id: ata.Id,
-              Title: ata.Title,
-              Projekt: ata.Projekt.Title,
-              Customer: ata.Customer,
-              Price: ata.Price,
-              Extent: ata.Extent,
-              isDone: ata.isDone
-            })).filter(item => item.isDone !== true)
-
-            const completedATA = controlItems.map((ata: any) => ({
-              Id: ata.Id,
-              Title: ata.Title,
-              Projekt: ata.Projekt.Title,
-              Customer: ata.Customer,
-              Price: ata.Price,
-              Extent: ata.Extent,
-              isDone: ata.isDone
-            })).filter(item => item.isDone === true);
-            setUpdateListItems(false);
-            setOngoingATA(ongoingATA);
-            setCompletedATA(completedATA);
-           
+            // Construct the full SharePoint REST API URL for lists
+            const listsUrl = `${project.AbsoluteSiteUrl}/_api/web/lists/getbytitle('ATA')/items`;
+        
+            // Fetch lists using SharePoint REST API
+            const response = await fetch(listsUrl, {
+              method: 'GET',
+              headers: {
+                'ACCEPT': 'application/json',
+              },
+            });       
+            if (response.ok) {
+              const listsData = await response.json();
+              setATA(listsData.value);
+              //console.log(`Lists for site ${siteUrl.webUrl}:`, listsData.value);
+            } else {
+              console.error(`Error fetching lists for site ${project.AbsoluteSiteUrl}:`, response.statusText);
+            }
           } catch (error) {
-            console.error(error);
+            console.error(`Error processing site ${project.AbsoluteSiteUrl}:`, error);
           }
-        };
-        fetchControlPointsData().catch((err) => {
+        })); 
+      };
+      useEffect(() => {
+        fetchATA().catch((err) => {
           console.error(err);
         });
       }, [updateListItems]);
@@ -117,15 +129,17 @@ const ATA: React.FC<IATAProps> = (props) =>{
 
   const renderOngoingATA = (): JSX.Element => {
 
-     const ata: any = ongoingATA.length > 0 ? ongoingATA.map((items: IATA) =>{
+     const ata: any = ATA.length > 0 ? ATA.map((items: IATA) =>{
+      const project : any = currentUserProjects.length > 0 ? currentUserProjects.map((project: any) =>{
+        if( items.isDone !== true ){
       const ataTitle = `Rubrik: ${items.Title}`;
-      const ataProject = `Projekt: ${items.Projekt}`;
+      const ataProject = `Projekt: ${project.Title}`;
       const ataCustomer = `Beställare: ${items.Customer}`
       const ataExtent = `Omfattning: ${items.Extent}`;
       const ataPrice = `Prissättning: ${items.Price}`;
       const isDone: boolean = items.isDone;
       const onShowButtonText = "Visa";
-      const buttonText = isDone === true ? "Klarmarkerad" : "Klarmarkera";
+      const buttonText =  "Klarmarkera";
       return(<DocumentCard
         key={items.Id}
         type={DocumentCardType.compact}
@@ -145,7 +159,7 @@ const ATA: React.FC<IATAProps> = (props) =>{
         <span key={items.Id} className={styles.cardItemProperties}>{ataPrice}</span>
         <div style={{paddingLeft: '10px', paddingTop:'5px'}}>
         <PrimaryButton
-                disabled={items.isDone}
+                disabled={isDone}
                 text={buttonText}
                 onClick={() => onUpdateATADone(items)}
               />
@@ -162,21 +176,24 @@ const ATA: React.FC<IATAProps> = (props) =>{
         </div>
         </DocumentCardDetails>
       </DocumentCard>)
-      
+      }
     }) : null;
-    return ata;
-    }
-
+    return project;
+  }): null;
+  return ata;
+  }
    const renderCompletedATA = ():JSX.Element =>{
-      const ata: any = completedATA.length > 0 ? completedATA.map((items: IATA) =>{
+      const ata: any = ATA.length > 0 ? ATA.map((items: IATA) =>{
+        const project : any = currentUserProjects.length > 0 ? currentUserProjects.map((project: any) =>{
+          if( items.isDone === true ){
         const ataTitle = `Rubrik: ${items.Title}`;
-        const ataProject = `Projekt: ${items.Projekt}`;
+        const ataProject = `Projekt: ${project.Title}`;
         const ataCustomer = `Beställare: ${items.Customer}`
         const ataExtent = `Omfattning: ${items.Extent}`;
         const ataPrice = `Prissättning: ${items.Price}`;
         const isDone: boolean = items.isDone;
         const onShowButtonText = "Visa";
-        const buttonText = isDone === true ? "Klarmarkerad" : "Klarmarkera";
+        const buttonText = "Klarmarkerad";
         return(<DocumentCard
           key={items.Id}
           type={DocumentCardType.compact}
@@ -196,7 +213,7 @@ const ATA: React.FC<IATAProps> = (props) =>{
           <span key={items.Id} className={styles.cardItemProperties}>{ataPrice}</span>
           <div style={{paddingLeft: '10px', paddingTop:'5px'}}>
           <PrimaryButton
-                  disabled={items.isDone}
+                  disabled={isDone}
                   text={buttonText}
                   onClick={() => onUpdateATADone(items)}
                 />
@@ -213,11 +230,13 @@ const ATA: React.FC<IATAProps> = (props) =>{
           </div>
           </DocumentCardDetails>
         </DocumentCard>)
-        
+      }
       }) : null;
   
-      return ata;
-    }
+      return project;
+    }): null;
+    return ata;
+  }
 
       return<div>     
           <Pivot
@@ -226,7 +245,7 @@ const ATA: React.FC<IATAProps> = (props) =>{
         linkSize={PivotLinkSize.large}
       >
         <PivotItem headerText="Pågående" itemKey="ongoing">
-          {ongoingATA.length > 0 ? <div
+          {ATA.length > 0 ? <div
             style={{
               marginBottom: 40,
               padding: 20,

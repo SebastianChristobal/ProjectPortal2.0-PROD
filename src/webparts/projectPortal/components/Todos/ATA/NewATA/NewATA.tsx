@@ -14,6 +14,7 @@ import "@pnp/sp/items/get-all";
 import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";  
+import { Web } from "@pnp/sp/webs";  
  import { IItemAddResult } from "@pnp/sp/items";
  import { spfi, SPFx } from "@pnp/sp";
 // import {INewProjectProps} from './INewProjectProps';
@@ -36,13 +37,15 @@ const NewATA: React.FC<INewATAProps> = (props) =>{
   const [extentValue, setExtentValue] = useState<string>('');  
   const [priceValue, setPriceValue] = useState<string>(''); 
   const [optValue, setOptValue] = useState<any>(null);
-  const [dropdownOptions, setDropdownOptions] = useState<IDropdownOption[]>([]);
-
-const _onOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
+  const [options, setOptions] = useState<IDropdownOption[]>([]);
+  const [selectedProjectWebUrl, setSelectedProjectWebUrl] = useState<string>('');
+ const _onOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: any, index?: number): void => {
   setOptValue(option.key);
+  setSelectedProjectWebUrl(option.webUrl);
 }
 const _onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
   setTitleValue(newValue);
+  
 }
 const _onCustomerTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
   setCustomerValue(newValue);
@@ -58,12 +61,12 @@ const onSaveATA = async (): Promise<any>  => {
   const ata: IATA = {
       Title: titleValue,
       Customer: customerValue,
-      ProjektId: optValue,
       Extent: extentValue,
       Price: priceValue
   }
   try{
-       const iar: IItemAddResult = await sp.web.lists.getByTitle("ATA").items.add(ata)
+    const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
+       const iar: IItemAddResult = await web.lists.getByTitle("ATA").items.add(ata)
        setTitleValue('');
        setCustomerValue('');
        setExtentValue('');
@@ -75,22 +78,56 @@ const onSaveATA = async (): Promise<any>  => {
       console.error(error);
       } 
 }
-
+const fetchProjects = async (): Promise<any> => {
+  const currentUser = await sp.web.currentUser();
+  try {
+    const items = await sp.web.lists.getByTitle("Projekt").items.select(
+      'Id',    
+      'Title', 
+      'ProjectType/Title',
+      'ProjectType/ID',
+      'Customer',
+      'ProjectManager/Title',
+      'ProjectMembers/Title',
+      'ProjectMembers/ID',
+      'ProjectManager/ID',
+      'ProjectLeader/Title',
+      'ProjectLeader/ID',
+      'ProjectImage',
+      'absoluteSiteUrl',
+      'Status',
+      'ContentType/Id'
+      ).expand('ProjectManager', 'ProjectLeader', 'ProjectType', 'ProjectMembers', 'ContentType').orderBy('Modified', true).getAll();
+    const myProjects = items.map((projects: any) => ({  
+        Id: projects.Id, 
+        Title: projects.Title,
+        Customer: projects.Customer,
+        ProjectLeader: projects.ProjectLeader,
+        ProjectManager: projects.ProjectManager,
+        ProjectMembers: projects.ProjectMembers,
+        ProjectImage: projects.ProjectImage,
+        Status: projects.Status,
+        ProjectType: projects.ProjectType,
+        AbsoluteSiteUrl: projects.absoluteSiteUrl,
+        ContentType: projects.ContentType
+    })).filter((item: any) => 
+      item.ProjectLeader.ID === currentUser.Id || 
+      item.ProjectManager.ID === currentUser.Id || 
+      item.ProjectMembers.some((member: any) => member.ID === currentUser.Id)
+     );
+      const options = myProjects.map((project: IProject) => ({
+          key: project.Id,
+          text: project.Title,
+          webUrl: project.AbsoluteSiteUrl
+      }));
+      setOptions(options);
+      }
+      catch (error) {
+          console.error(error);
+      }
+};
 useEffect(() => {
-  const fetchProjectsAsOptions = async (): Promise<any> => {
-      try {
-          const items = await sp.web.lists.getByTitle("Projekt").items();
-          const dropdownOptions = items.map((project: IProject) => ({
-              key: project.Id,
-              text: project.Title
-          }));
-          setDropdownOptions(dropdownOptions);
-          }
-          catch (error) {
-              console.error(error);
-          }
-  };
-  fetchProjectsAsOptions().catch((err) => {
+  fetchProjects().catch((err) => {
       console.error(err);
   });
 }, []); 
@@ -116,7 +153,7 @@ useEffect(() => {
          <Dropdown
             placeholder="Välj projekt"
             label="Projekt"
-            options={ dropdownOptions }
+            options={ options }
             onChange={ _onOptionsChange }
             selectedKey={optValue}
             required={true}
@@ -149,7 +186,7 @@ useEffect(() => {
             <div className={styles.buttonWrapper}>
                 <PrimaryButton 
                 text="Skapa ÄTA"
-                disabled={!titleValue || !customerValue || !extentValue || !priceValue || !optValue || !dropdownOptions }
+                disabled={!titleValue || !customerValue || !extentValue || !priceValue || !optValue || !options }
                 onClick={ onSaveATA }
                 />
              </div>

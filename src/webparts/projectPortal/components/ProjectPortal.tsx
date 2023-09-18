@@ -86,14 +86,15 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
              headerText="Registrera aktivitet"        
              itemKey="registerActivity"
              />
+              <PivotItem 
+             headerText="Registrera kontroll"        
+             itemKey="RegisterCompletedControl"
+             />
              <PivotItem 
              headerText="Registrera ÄTA"        
              itemKey="registerATA"
              />
-            <PivotItem 
-             headerText="Registrera genomförd kontroll"        
-             itemKey="RegisterCompletedControl"
-             />
+           
       </Pivot>
       </div>
     <HashRouter>

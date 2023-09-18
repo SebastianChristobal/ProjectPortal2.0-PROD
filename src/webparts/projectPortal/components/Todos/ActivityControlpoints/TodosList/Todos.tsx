@@ -62,19 +62,9 @@ import { IProject } from "../../../Models";
 
 const Todos: React.FC<ITodosProps> = (props) =>{
 const sp = spfi().using(SPFx(props.context));
-// const _spService = new ProjectService(props.context);
-// const graph = graphfi().using(graphSPFx(props.context));
-
-const [ongoingActivities, setOngoingActivities] = useState([]);
-//const [completedActivities, setCompletedActivities] = useState([]);
+const [activities, setActivities] = useState([]);
 const [currentUserProjects, setCurrentUserProjects] = useState([]);
-//const [activitieslistColumns, setActivitiesListColumns] = useState<IColumn[]>([]);
- const [updateListItems, setUpdateListItems] = useState(null);
-// const [selectedActivityItem, setSelectedActivityItem] = useState<IActivity>({});   
-//const [projectState, dispatchProject] = useReducer(fetchProjectReducer, INITIAL_PROJECT_STATE);
-//const [activitiesState, dispatchActivities] = useReducer(fetchReducer, INITIAL_STATE);
-
-
+const [updateListItems, setUpdateListItems] = useState(null);
 
 
  const onActivityDone = (activity: IActivity, project: IProject): void => {
@@ -153,7 +143,7 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
         });       
         if (response.ok) {
           const listsData = await response.json();
-          setOngoingActivities(listsData.value);
+          setActivities(listsData.value);
           //console.log(`Lists for site ${siteUrl.webUrl}:`, listsData.value);
         } else {
           console.error(`Error fetching lists for site ${project.AbsoluteSiteUrl}:`, response.statusText);
@@ -224,7 +214,7 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
  
 
   const renderOngoingActivities = (): JSX.Element =>{
-    const activity: any = ongoingActivities.length > 0 ? ongoingActivities.map((items: any) =>{
+    const activity: any = activities.length > 0 ? activities.map((items: any) =>{
     const project : any = currentUserProjects.length > 0 ? currentUserProjects.map((project: any) =>{
     const activityTypeName = items.ContentType.Name === 'Controlpoint' ? 'Kontrollpunkt': 'Aktivitet';
     if( items.isDone !== true ){
@@ -279,7 +269,7 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
   }
 
   const renderCompletedActivities = (): JSX.Element =>{
-    const activity: any = ongoingActivities.length > 0 ? ongoingActivities.map((items: any) =>{
+    const activity: any = activities.length > 0 ? activities.map((items: any) =>{
     const project : any = currentUserProjects.length > 0 ? currentUserProjects.map((project: any) =>{
     const activityTypeName = items.ContentType.Name === 'Controlpoint' ? 'Kontrollpunkt': 'Aktivitet';
     if( items.isDone === true ){
@@ -383,7 +373,7 @@ const [currentUserProjects, setCurrentUserProjects] = useState([]);
 
   //   return activity;
   // }
-  console.log(ongoingActivities);
+  console.log(activities);
   console.log(updateListItems);
  // console.log(projectState);
 
