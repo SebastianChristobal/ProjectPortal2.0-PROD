@@ -11,5 +11,12 @@ export interface IActivity{
     Responsible?: any;
     ResponsibleId?: any; 
     DueDate1?: any;
-    ContentType?: any;
+    ContentTypeId?: any;
 }
+
+export interface IContentType {
+    ContentType: {
+      Name: string;
+      Id: any;
+    };
+  }

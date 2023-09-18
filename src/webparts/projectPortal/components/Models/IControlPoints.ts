@@ -11,6 +11,7 @@ export interface IControlPoints{
     ControlTypeId?: any;
     ImplementedBy?: any;
     ImplementedById?: any;
-    Date?: Date;  
+    StartDate?: Date;  
     isDone?: boolean;
+    ContentTypeId?:any;
 }

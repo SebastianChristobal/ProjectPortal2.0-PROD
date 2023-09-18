@@ -23,7 +23,8 @@ import "@pnp/sp/fields";
 import "@pnp/sp/lists/web";
 import "@pnp/sp/attachments";
 import { IItemAddResult } from "@pnp/sp/items";
-import { spfi, SPFx } from "@pnp/sp";
+import { Web } from "@pnp/sp/webs";  
+ import { spfi, SPFx } from "@pnp/sp";
 import { TextField } from '@fluentui/react/lib/TextField';
 import { 
   PrimaryButton, 
@@ -37,6 +38,7 @@ import { INewControlPointProps } from "./INewControlPointProps";
 import styles from "../../../ProjectPortal.module.scss";
 import { IControlPoints } from "../../../Models/IControlPoints";
 import { IProject, IUser } from "../../../Models";
+import { IContentType } from "../../../Models/IActivity";
 
 const NewControlPoint: React.FC<INewControlPointProps> = (props) =>{
   const sp = spfi().using(SPFx(props.context));
@@ -47,14 +49,16 @@ const NewControlPoint: React.FC<INewControlPointProps> = (props) =>{
   const [selectedDateValue, setSelectedDateValue] = useState<Date>(null);
   const [optControlTypeValue, setOptControlTypeValue] = useState<any>(null);
   const [optControlTypeKey, setOptControlTypeKey] = useState<any>(null);
-  const [projectDropdownOptions, setProjectDropdownOptions] = useState<IDropdownOption[]>([]);
+  const [selectedProjectWebUrl, setSelectedProjectWebUrl] = useState<string>('');
+  const [options, setOptions] = useState<IDropdownOption[]>([]);
   const [controlTypeOptions, setControlTypeOptions] = useState<IDropdownOption[]>([]);
   const [implementedBy, setImplementedBy] = useState([]);
    const [selectedFiles, setSelectedFiles] = useState([]);
   const _getImplementedBy = (props: IUser[]): void => {  setImplementedBy(props);}
 
-const _onProjectOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
+const _onProjectOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: any, index?: number): void => {
   setProjectOptionsValue(option.key);
+  setSelectedProjectWebUrl(option.webUrl);
 }
 const _onControlTypeOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
     setOptControlTypeValue(option.text);
@@ -104,49 +108,96 @@ const handleFileChange = (event: any): void => {
 //     console.error('Error uploading files:', error);
 //   }
 // };
-
 const onSaveControlPoint = async (): Promise<any>  => {
+  const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
   const implementedByUser = implementedBy.map((items: IUser) =>{return items.id})[0];
   const selectedUser = await sp.web.ensureUser(implementedByUser);
+  const contentTypes : IContentType[] = await web.lists.getByTitle("Activities").items.select('ContentType/Id,ContentType/Name').expand('ContentType').getAll();
+  console.log(contentTypes);
+  console.log(selectedUser);
+  const contentType = contentTypes.find(contentType => 
+    contentType.ContentType.Name === 'Controlpoint'
+  );
+  console.log(contentType.ContentType.Id.StringValue);
   const controlPoint: IControlPoints = {
-      Title: titleValue,
-      ProjektId: projectOptionsValue,
-      Description: descriptionValue,
-      ControlType: optControlTypeValue,
-      Date: selectedDateValue,
-      ImplementedById: selectedUser.data.Id
-  }
+    ContentTypeId: contentType.ContentType.Id.StringValue,
+    Title: titleValue,
+    Description: descriptionValue,
+    ControlType: optControlTypeValue,
+    StartDate: selectedDateValue,
+    ImplementedById: selectedUser.data.Id
+}
+  //const contentTypeId = selectedProjectContentTypeId;
   try{
-       const iar: IItemAddResult = await sp.web.lists.getByTitle("Control").items.add(controlPoint);
-      setTitleValue('');
-      setDescriptionValue('');
-      setProjectOptionsValue(null);
-      setSelectedDateValue(null);
-      setOptControlTypeKey(null);
-      setImplementedBy([]);
-       console.log(iar);
-      }
-  catch(error){
-      console.error(error);
-      }    
+    const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
+    const iar: IItemAddResult = await web.lists.getByTitle("Activities").items.add(controlPoint);
+   setTitleValue('');
+   setDescriptionValue('');
+   setProjectOptionsValue(null);
+   setSelectedDateValue(null);
+   setOptControlTypeKey(null);
+   setImplementedBy([]);
+    console.log(iar);
+   }
+catch(error){
+   console.error(error);
+   }    
+   
 }
 
-useEffect(() => {
-  const fetchProjectsAsOptions = async (): Promise<any> => {
-      try {
-          const items = await sp.web.lists.getByTitle("Projekt").items();
-          const dropdownOptions = items.map((project: IProject) => ({
-              key: project.Id,
-              text: project.Title
-          }));
-          setProjectDropdownOptions(dropdownOptions);
-          }
-          catch (error) {
-              console.error(error);
-          }
-  };
+const fetchProjects = async (): Promise<any> => {
+  const currentUser = await sp.web.currentUser();
+  try {
+    const items = await sp.web.lists.getByTitle("Projekt").items.select(
+      'Id',    
+      'Title', 
+      'ProjectType/Title',
+      'ProjectType/ID',
+      'Customer',
+      'ProjectManager/Title',
+      'ProjectMembers/Title',
+      'ProjectMembers/ID',
+      'ProjectManager/ID',
+      'ProjectLeader/Title',
+      'ProjectLeader/ID',
+      'ProjectImage',
+      'absoluteSiteUrl',
+      'Status',
+      'ContentType/Id'
+      ).expand('ProjectManager', 'ProjectLeader', 'ProjectType', 'ProjectMembers', 'ContentType').orderBy('Modified', true).getAll();
+    const myProjects = items.map((projects: any) => ({  
+        Id: projects.Id, 
+        Title: projects.Title,
+        Customer: projects.Customer,
+        ProjectLeader: projects.ProjectLeader,
+        ProjectManager: projects.ProjectManager,
+        ProjectMembers: projects.ProjectMembers,
+        ProjectImage: projects.ProjectImage,
+        Status: projects.Status,
+        ProjectType: projects.ProjectType,
+        AbsoluteSiteUrl: projects.absoluteSiteUrl,
+        ContentType: projects.ContentType
+    })).filter(item => 
+      item.ProjectLeader.ID === currentUser.Id || 
+      item.ProjectManager.ID === currentUser.Id || 
+      item.ProjectMembers.some((member: any) => member.ID === currentUser.Id)
+     );
+     // const webUrl = items.filter(item => item.absoluteSiteUrl);  
+      const options = myProjects.map((project: IProject) => ({
+          key: project.Id,
+          text: project.Title,
+          webUrl: project.AbsoluteSiteUrl
+      }));
+     
+      setOptions(options);
+      }
+      catch (error) {
+          console.error(error);
+      }
+};
 
-  fetchProjectsAsOptions().catch((err) => {
+useEffect(() => {
+  fetchProjects().catch((err) => {
       console.error(err);
   });
 }, []); 
@@ -195,7 +246,7 @@ useEffect(() => {
         <Dropdown
                 placeholder="Välj projekt"
                 label="Projekt"
-                options={ projectDropdownOptions }
+                options={ options }
                 onChange={ _onProjectOptionsChange }
                 required={true}
                 defaultValue={projectOptionsValue}

@@ -31,24 +31,26 @@ import {
   DatePicker
  } from "office-ui-fabric-react";
 import { IProject, IUser } from '../../../Models';
-import { IActivity } from '../../../Models/IActivity';
+import { IActivity, IContentType } from '../../../Models/IActivity';
 
 
 
-const NewTodo: React.FC<INewTodoProps> = (props) =>{
+const NewActivity: React.FC<INewTodoProps> = (props) =>{
     const sp = spfi().using(SPFx(props.context));
 
    const [titleValue, setTitleValue] = useState<string>('');   
    const [descValue, setdescValue] = useState<string>('');  
    const [selectedDateValue, setSelectedDateValue] = useState<Date>(null);
    const [selectedProjectWebUrl, setSelectedProjectWebUrl] = useState<string>('');
-   const [selectedProjectContentTypeId, setSelectedProjectContentTypeId] = useState<string>('');
+  // const [selectedProjectContentTypeId, setSelectedProjectContentTypeId] = useState<string>('');
   // const [absoluteSiteUrl: setAbsoluteSiteUrl] = useState<string>('');
 //   const [priceValue, setPriceValue] = useState<string>(''); 
    const [projectOptionsValue, setProjectOptionsValue] = useState<any>(null);
-   const [activityOptionsValue, setActivityOptionsValue] = useState<any>(null);
+  // const [activityOptionsValue, setActivityOptionsValue] = useState<any>(null);
    const [options, setOptions] = useState<IDropdownOption[]>([]);
-   const [activityOptions, setActivityOptions] = useState<IDropdownOption[]>([]);
+   //const [activityOptions, setActivityOptions] = useState<IDropdownOption[]>([]);
+
+
    const [manager, setManager] = useState([]);
    const _getManager= (props: IUser[]): void => {  setManager(props);}
 
@@ -57,10 +59,7 @@ const NewTodo: React.FC<INewTodoProps> = (props) =>{
     setSelectedProjectWebUrl(option.webUrl);
     
   }
-  const onActivityChangeHandler = (event: React.FormEvent<HTMLDivElement>, option?: any, index?: number): void => {
-    setActivityOptionsValue(option.key);
-    setSelectedProjectContentTypeId(option.contentTypeId);
-  }
+
    const _onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
     setTitleValue(newValue);
   }
@@ -72,19 +71,25 @@ const NewTodo: React.FC<INewTodoProps> = (props) =>{
   }
 
   const onSaveActivty = async (): Promise<any>  => {
-    const web = Web(selectedProjectWebUrl);
+    const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
     const selectedManager = manager.map((items: IUser) =>{return items.id})[0];
     const selectedUser = await web.ensureUser(selectedManager);
-    const contentTypeId = selectedProjectContentTypeId;
+    const contentTypes : IContentType[]  = await web.lists.getByTitle("Activities").items.select('ContentType/Id,ContentType/Name').expand('ContentType').getAll();
+    const contentType = contentTypes.find(contentType => 
+      contentType.ContentType.Name === 'Activity'
+    );
+    console.log(contentType.ContentType.Id.StringValue);
+    //const contentTypeId = selectedProjectContentTypeId;
     const activities: IActivity = {
+        ContentTypeId: contentType.ContentType.Id.StringValue,
         Title: titleValue,
         ResponsibleId: selectedUser.data.Id,
-        ProjektId: projectOptionsValue,
         Description: descValue,
         DueDate1: selectedDateValue,
-        ContentType: contentTypeId
+   
     }
     try{
+         const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
          const iar: IItemAddResult = await web.lists.getByTitle("Activities").items.add(activities);
          setTitleValue('');
          setdescValue('');
@@ -139,8 +144,7 @@ const NewTodo: React.FC<INewTodoProps> = (props) =>{
         const options = myProjects.map((project: IProject) => ({
             key: project.Id,
             text: project.Title,
-            webUrl: project.AbsoluteSiteUrl,
-            contentTypeId: project.ContentType.Id.StringValue
+            webUrl: project.AbsoluteSiteUrl
         }));
        
         setOptions(options);
@@ -149,31 +153,13 @@ const NewTodo: React.FC<INewTodoProps> = (props) =>{
             console.error(error);
         }
 };
-const fetchActivityTypes = async (webUrl: string):Promise<any> => {
-  const web: any = Web(webUrl);
-  try {
-    const items = await web.lists.getByTitle("Activities").items();
-    console.log(items);
-
-     // const webUrl = items.filter(item => item.absoluteSiteUrl);  
-      const activityOptions = items.map((options: IActivity) => ({
-          key: options.Id,
-          text: options.Title,
-          contentTypeId: options.ContentType.Id.StringValue
-      }));
-      setActivityOptions(activityOptions);
-      }
-      catch (error) {
-          console.error(error);
-      }
-}
- 
 
    useEffect(() => {
     fetchProjects().catch((err) => {
         console.error(err);
     });
   }, []); 
+
 
 
 return(<React.Fragment>
@@ -201,15 +187,6 @@ return(<React.Fragment>
             onChange={ _onProjectOptionsChange }
             required={true}
             selectedKey={projectOptionsValue}
-            // onChange={dropdownOpt}
-          />
-          <Dropdown
-            placeholder="Välj aktivitetstyp"
-            label="activityType"
-            options={ activityOptions }
-            onChange={ onActivityChangeHandler }
-            required={true}
-            selectedKey={activityOptionsValue}
             // onChange={dropdownOpt}
           />
           <TextField 
@@ -271,4 +248,4 @@ return(<React.Fragment>
 
 
 
-export default NewTodo;
+export default NewActivity;

@@ -122,7 +122,7 @@ const ControlPoints: React.FC<IControlPointsProps> = (props) => {
       const controlpointProject = `Projekt: ${items.Projekt}`;
       const controlpointControlType = `Kontrolltyp: ${items.ControlType}`
       const controlpointImplementedBy = `Genomförd av: ${items.ImplementedBy}`;
-      const controlpointDate = `Datum: ${items.Date}`;
+      const controlpointDate = `Datum: ${items.StartDate}`;
       const controlpointDescription = `Beskrivning: ${items.Description}`;
       const isDone: boolean = items.isDone;
       const onShowButtonText = "Visa";
@@ -176,7 +176,7 @@ const ControlPoints: React.FC<IControlPointsProps> = (props) => {
       const controlpointProject = `Projekt: ${items.Projekt}`;
       const controlpointControlType = `Kontrolltyp: ${items.ControlType}`
       const controlpointImplementedBy = `Genomförd av: ${items.ImplementedBy}`;
-      const controlpointDate = `Datum: ${items.Date}`;
+      const controlpointDate = `Datum: ${items.StartDate}`;
       const controlpointDescription = `Beskrivning: ${items.Description}`;
       const isDone: boolean = items.isDone;
       const onShowButtonText = "Visa";

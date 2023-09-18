@@ -19,9 +19,9 @@ import NewProject from './Projects/NewProject/NewProject';
 import Start from './Start/Start';
 import ProjectDetail from './Projects/ProjectDetails/ProjectDetail';
 import NewATA from './Todos/ATA/NewATA/NewATA';
-import NewControlPoint from './Todos/Controlpoints/NewControlPoint/NewControlPoint';
+import NewControlPoint from './Todos/ActivityControlpoints/NewControlPoint/NewControlPoint';
 import AllProjects from './Projects/AllProjects/AllProjects';
-import NewTodo from './Todos/ActivityControlpoints/NewTodo/NewTodo';
+import NewTodo from './Todos/ActivityControlpoints/NewActivity/NewActivity';
 
 const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps) =>{
   const {SPHttpClient, context, siteAbsolutetUrl} = props;
