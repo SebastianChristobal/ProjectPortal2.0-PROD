@@ -223,7 +223,6 @@ const ControlPoints: React.FC<IControlPointsProps> = (props) => {
     }) : null;
     return controlpoints;
   };
-
   return <div>     
        <Pivot
         defaultSelectedKey={"0"}
