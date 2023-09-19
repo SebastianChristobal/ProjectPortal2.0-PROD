@@ -35,7 +35,7 @@
     display: flex;
     height: 180px;
     margin: auto;
-    background-color: rgb(116, 138, 138);
+
 }
 .projectFasWrapper{
     @include ms-Grid-row;
@@ -84,7 +84,7 @@
     padding-left: 0 !important;
     position: inherit;
     margin: 0px;
-    background-color: beige;
+
 }
 .projectDetailColumnTwo{
   @include ms-Grid-col;
@@ -97,7 +97,7 @@
   padding-left: 0 !important;
   position: inherit;
   margin: 0px;
-  background-color: rgb(213, 213, 165);
+
 }
 .projectDetailColumnThree{
   @include ms-Grid-col;
@@ -110,7 +110,6 @@
   padding-left: 0 !important;
   position: inherit;
   margin: 0px;
-  background-color: rgb(76, 76, 59);
 }
 .activityColumn{
   @include ms-Grid-row;
@@ -225,7 +224,7 @@
     position: inherit;
     height: 200px;
     margin: 0px;
-    background-color: rgb(76, 76, 59);
+ 
   }
   .projectDetailButtonsWrapper{
     @include ms-Grid-col;

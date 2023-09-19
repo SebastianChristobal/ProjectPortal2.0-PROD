@@ -21,7 +21,10 @@ import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";
 import '@pnp/graph/groups';
 import "@pnp/graph/members";
-import { graphfi, SPFx as graphSPFx } from "@pnp/graph";
+import { FontIcon } from '@fluentui/react/lib/Icon';
+import { mergeStyles } from '@fluentui/react/lib/Styling';
+import { Panel, PanelType } from '@fluentui/react/lib/Panel';
+//import { graphfi, SPFx as graphSPFx } from "@pnp/graph";
 import "@pnp/graph/teams";
 import { spfi, SPFx,  } from "@pnp/sp";
 import { IProjectDetailProps } from "./IProjectDetailProps";
@@ -31,70 +34,62 @@ import { IProject } from "../../Models";
 // const theme = getTheme();
 // const { palette, fonts } = theme;
 
+const iconClass = mergeStyles({
+  fontSize: 17,
+  height: 17,
+  width: 15,
+  marginLeft: '32px',
+  marginRight: '30px'
+});
+
 const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
     const sp = spfi().using(SPFx(props.context));
-    const graph = graphfi().using(graphSPFx(props.context));
     const [selectedProject, setSelectedProject] = useState<IProject>({});
-    const [selectedMSTeam, setSelectedMSTeam] = useState<any>({});
+    const [isOpen, setIsOpen] = useState(false);
+
+    const editSelectedProject = (): void => {
+      setIsOpen(true)
+    }
+    const dismissPanel = (): void => {
+      setIsOpen(false);
+    }
+
+    const fetchSelectedProject = async (): Promise<any> => {
+      try {
+          const currentUrl = window.location.href.split('/');
+          const projectId = parseInt(currentUrl[currentUrl.length - 1]);
+          const selectedProject = await sp.web.lists.getByTitle("Projekt").items.getById(projectId).select(
+            'Id',    
+            'Title', 
+            'ProjectType/Title',
+            'ProjectType/ID',
+            'Customer',
+            'ProjectManager/Title',
+            'ProjectMembers/Title',
+            'ProjectMembers/ID',
+            'ProjectManager/ID',
+            'ProjectLeader/Title',
+            'ProjectLeader/ID',
+            'ProjectImage',
+            'Status',
+            'Budget',
+            'Resources',
+            'Time'
+            )
+            .expand('ProjectManager', 'ProjectLeader', 'ProjectType', 'ProjectMembers')();
+           setSelectedProject(selectedProject);
+          }
+        catch (error) {
+          console.error(error);
+   }
+  };
     
     useEffect(() => {
-        const fetchData = async (): Promise<any> => {
-            try {
-                const currentUrl = window.location.href.split('/');
-                const projectId = parseInt(currentUrl[currentUrl.length - 1]);
-                const projectProps = await sp.web.lists.getByTitle("Projekt").items.getById(projectId).select(
-                  'Id',    
-                  'Title', 
-                  'ProjectType/Title',
-                  'ProjectType/ID',
-                  'Customer',
-                  'ProjectManager/Title',
-                  'ProjectMembers/Title',
-                  'ProjectMembers/ID',
-                  'ProjectManager/ID',
-                  'ProjectLeader/Title',
-                  'ProjectLeader/ID',
-                  'ProjectImage',
-                  'Status',
-                  'TeamsID'
-                  )
-                  .expand('ProjectManager', 'ProjectLeader', 'ProjectType', 'ProjectMembers')
-                  ();
-                  const teamsIdJsonString =  JSON.parse(projectProps.TeamsID);
-                  const newTeamId = teamsIdJsonString.newTeamId; // Keep the full ID initially
-                  const teams = await graph.teams.getById(`${newTeamId}`)();
-        
-                  const members = await graph.groups.getById(`${newTeamId}`).members();
-                  const owners = await graph.groups.getById(`${newTeamId}`).owners();
-                  const url = await graph.groups.getById(`${newTeamId}`)
-                // const myProjects = items.map((projects: any) => ({  
-                //     Id: projects.Id, 
-                //     Title: projects.Title,
-                //     Customer: projects.Customer,
-                //     ProjectLeader: projects.ProjectLeader,
-                //     ProjectManager: projects.ProjectManager,
-                //     ProjectMembers: projects.ProjectMembers,
-                //     ProjectImage: projects.ProjectImage,
-                //     Status: projects.Status,
-                //     ProjectType: projects.ProjectType
-                // }));
-                 console.log(members);
-                 console.log(url);
-                 setSelectedMSTeam(owners)
-                 setSelectedProject(projectProps);
-                 console.log(teams.group.sites);
-                }
-              catch (error) {
-                console.error(error);
-         }
-        };
-        fetchData().catch((err) => {
+      fetchSelectedProject().catch((err) => {
             console.error(err);
         });
     }, []); 
 
-    console.log(selectedProject)
-    console.log(selectedMSTeam)
    const renderSelectedProject = ():JSX.Element =>{
     if(selectedProject.Title !== undefined){
       const projectMembers = selectedProject.ProjectMembers.map((members: any) => {return members.Title});
@@ -110,16 +105,20 @@ const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
            // onClick={() => this.onOpenPanelHandler(items)}
             style={{
               maxWidth: '100%',
-              height: '100%'
+              height: '100%',
+              border: 'none'
             }}
           >
             <DocumentCardDetails styles={{root:{
               justifyContent: 'flex-start'
             }}}   >              
-            <DocumentCardTitle 
-            title={selectedProject.Title}
-            className={styles.cardTitle} 
+            <div style={{display:'flex', alignItems: 'center', minHeight: '40px' }}>
+              <DocumentCardTitle 
+              title={selectedProject.Title}
+              className={styles.cardTitle} 
              />
+            <FontIcon aria-label="OpenEnrollment" iconName="OpenEnrollment" className={iconClass}  onClick={editSelectedProject}/>
+            </div>
             <span  className={styles.cardItemProperties}>{selectedProjectCustomer}</span>
             <span  className={styles.cardItemProperties}>{selectedProjectType}</span>
             <span  className={styles.cardItemProperties}>{selectedProjectLeader}</span>
@@ -131,20 +130,73 @@ const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
    }
 
    const renderProjectImage = (): JSX.Element =>{
-    if(selectedProject.ProjectImage !== ''){
+    if(selectedProject.ProjectImage !== undefined){
       return <img width={'100%'} height={'100%'} src={selectedProject.ProjectImage} />
     }
    }
+   
+   const getStatusColor = (status: any): any => { 
+    switch (status) {
+      case 'Low':
+        return 'green';
+      case 'Medium':
+        return 'yellow';
+      case 'High':
+        return 'red';
+      default:
+        return 'gray'; // You can set a default color for other cases
+    }
+  };
+   const renderProjectStatuses = (): JSX.Element =>{
+    if (selectedProject.Title !== undefined) {
+      return (
+        <React.Fragment>
+          <div style={{width: '100%', display: 'flex', alignItems: 'center', padding:'20px 1px 1px 20px'}}>
+            <div style={{minWidth: '70px'}}>Budget</div>
+            <div style={{ backgroundColor: getStatusColor(selectedProject.Budget), width: '15px', height: '15px', borderRadius: '10px' }} />
+          </div>
+          <div style={{width: '100%', display: 'flex', alignItems: 'center',  padding:'20px 1px 1px 20px' }}>
+          <div style={{minWidth: '70px'}}>Tid</div>
+            <div  style={{ backgroundColor: getStatusColor(selectedProject.Time), width: '15px', height: '15px', borderRadius: '10px' }}/>
+          </div>
+          <div style={{width: '100%', display: 'flex', alignItems: 'center', padding:'20px 1px 1px 20px' }}>
+          <div style={{minWidth: '70px'}}>Resurser</div>
+            <div style={{ backgroundColor: getStatusColor(selectedProject.Resources), width: '15px', height: '15px', borderRadius: '10px' }}/>
+          </div>
+        </React.Fragment>
+      );
+    }
+   }
+
 
 return(<React.Fragment>
       <div className={styles.ProjectDetailsPage}>
+        {
+           <Panel
+           isOpen={isOpen}
+           onDismiss={dismissPanel}
+           type={PanelType.smallFixedFar}
+           //customWidth={panelType === PanelType.custom || panelType === PanelType.customNear ? '888px' : undefined}
+           closeButtonAriaLabel="Stäng"
+           headerText="Redigera"
+         >
+           <p>
+            hejsan
+             {/* This is {a} <strong>{description}</strong> panel
+             {panelType === PanelType.smallFixedFar ? ' (the default size)' : ''}. */}
+           </p>
+           {/* <p>
+             Select this size using <code>{`type={PanelType.${PanelType[panelType]}}`}</code>.
+           </p> */}
+         </Panel>
+        }
          <div className={styles.projectDetailsAndFasWrapper}>
           <div className={styles.projectDetailsWrapper}>
             <div className={styles.projectDetailColumnOne}>
                 {renderSelectedProject()}
             </div>
              <div className={styles.projectDetailColumnTwo} >
-                  test2
+                 {renderProjectStatuses()}
             </div>       
             <div className={styles.projectDetailColumnThree} >
                  {renderProjectImage()}

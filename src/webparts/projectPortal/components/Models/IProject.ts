@@ -14,4 +14,7 @@ export interface IProject{
     Status?: string;
     ContentType?: any;
     AbsoluteSiteUrl?: string;
+    Budget?: string;
+    Time?: string;
+    Resources?: string;
 }
