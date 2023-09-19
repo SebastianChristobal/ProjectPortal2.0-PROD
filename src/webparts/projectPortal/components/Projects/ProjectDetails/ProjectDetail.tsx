@@ -6,6 +6,7 @@ import {
     DocumentCardTitle,
     DocumentCardType
 } from 'office-ui-fabric-react/lib/DocumentCard';
+import { TextField } from '@fluentui/react/lib/TextField';
 // import { getTheme } from '@fluentui/react/lib/Styling';
 // import {
 //     PrimaryButton,
@@ -26,6 +27,10 @@ import { mergeStyles } from '@fluentui/react/lib/Styling';
 import { Panel, PanelType } from '@fluentui/react/lib/Panel';
 //import { graphfi, SPFx as graphSPFx } from "@pnp/graph";
 import "@pnp/graph/teams";
+import { 
+  Dropdown, 
+  IDropdownOption
+} from '@fluentui/react/lib/Dropdown';
 import { spfi, SPFx,  } from "@pnp/sp";
 import { IProjectDetailProps } from "./IProjectDetailProps";
 import { Label } from "office-ui-fabric-react";
@@ -44,16 +49,44 @@ const iconClass = mergeStyles({
 
 const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
     const sp = spfi().using(SPFx(props.context));
+    //const [titleValue, setTitleValue] = useState<string>(''); 
+    const [customerValue, setCustomerValue] = useState<string>('');  
     const [selectedProject, setSelectedProject] = useState<IProject>({});
     const [isOpen, setIsOpen] = useState(false);
-
+    const [budgetstatusOptions, setBudgetstatusOptions] = useState<IDropdownOption[]>([]);
+    const [timeStatusOptions, setTimeStatusOptions] = useState<IDropdownOption[]>([]);
+    const [resourcesStatusOptions, setResourcesStatusOptions] = useState<IDropdownOption[]>([]);
+    //const [optBudgetValue, setOptBudgetValue] = useState<any>('');
+    //const [optTimeValue, setOptTimeValue] = useState<any>('');
+    //const [optResourcesValue, setOptResourcesValue] = useState<any>('');
+    const [optBudgetKey, setOptBudgetKey] = useState<any>(null);
+    const [optResourcesKey, setOptResourcesKey] = useState<any>(null);
+    const [optTimeKey, setOptTimeKey] = useState<any>(null);
+   
+    // const _onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
+    //   setTitleValue(newValue);
+    // }
+    const _onCustomerTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
+      setCustomerValue(newValue);
+    }
     const editSelectedProject = (): void => {
       setIsOpen(true)
     }
     const dismissPanel = (): void => {
       setIsOpen(false);
     }
-
+    const _onTimeStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
+      //setOptTimeValue(option.text);
+      setOptTimeKey(option.key);
+  }
+  const _onResourcesStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
+    //setOptResourcesValue(option.text);
+    setOptResourcesKey(option.key);
+}
+const _onBudgetStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
+  //setOptBudgetValue(option.text);
+  setOptBudgetKey(option.key);
+}
     const fetchSelectedProject = async (): Promise<any> => {
       try {
           const currentUrl = window.location.href.split('/');
@@ -89,6 +122,13 @@ const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
             console.error(err);
         });
     }, []); 
+
+    useEffect(() => {
+      const options : IDropdownOption[] = [{ key: '1', text: 'Låg'   }, {  key: '2', text: 'Medel'}, {  key: '3', text: 'Hög'}]
+      setBudgetstatusOptions(options);
+      setTimeStatusOptions(options);
+      setResourcesStatusOptions(options);
+    }, []);
 
    const renderSelectedProject = ():JSX.Element =>{
     if(selectedProject.Title !== undefined){
@@ -134,6 +174,19 @@ const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
       return <img width={'100%'} height={'100%'} src={selectedProject.ProjectImage} />
     }
    }
+   const getStatusKey = (status: any): any => { 
+    switch (status) {
+      case 'Low':
+        return '1';
+      case 'Medium':
+        return '2';
+      case 'High':
+        return '3';
+      default:
+        return '0'; // You can set a default color for other cases
+    }
+  };
+  
    
    const getStatusColor = (status: any): any => { 
     switch (status) {
@@ -147,6 +200,9 @@ const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
         return 'gray'; // You can set a default color for other cases
     }
   };
+  
+  
+
    const renderProjectStatuses = (): JSX.Element =>{
     if (selectedProject.Title !== undefined) {
       return (
@@ -168,7 +224,8 @@ const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
     }
    }
 
-
+console.log(selectedProject);
+console.log(optBudgetKey);
 return(<React.Fragment>
       <div className={styles.ProjectDetailsPage}>
         {
@@ -180,11 +237,47 @@ return(<React.Fragment>
            closeButtonAriaLabel="Stäng"
            headerText="Redigera"
          >
-           <p>
-            hejsan
-             {/* This is {a} <strong>{description}</strong> panel
-             {panelType === PanelType.smallFixedFar ? ' (the default size)' : ''}. */}
-           </p>
+            <TextField 
+             label="Kund"
+             // errorMessage="Error message" 
+             value={ customerValue !== '' ? customerValue : selectedProject.Customer  }
+             required={false}
+             disabled={true}
+             onChange={ _onCustomerTextFieldChange }
+             />
+                <Dropdown
+                //placeholder="Välj status"
+                label="Budget"
+                options={ budgetstatusOptions }
+                onChange={ _onBudgetStatusOptionsChange }
+                required={false}
+                defaultSelectedKey={optBudgetKey !== null ? optBudgetKey : getStatusKey(selectedProject.Budget)}
+                selectedKey={optBudgetKey}
+                disabled={true}
+                //defaultValue={optBudgetValue !== '' ? optBudgetValue : selectedProject.Budget}
+            />
+               <Dropdown
+               // placeholder="Välj status"
+                label="Tid"
+                options={ timeStatusOptions }
+                onChange={ _onTimeStatusOptionsChange }
+                required={false}
+                selectedKey={optTimeKey}
+                disabled={true}
+                defaultSelectedKey={optTimeKey !== null ? optTimeKey : getStatusKey(selectedProject.Time)}
+                //defaultValue={optTimeValue !== '' ? optTimeValue : selectedProject.Time}
+            />
+              <Dropdown
+                //placeholder="Välj status"
+                label="Resurser"
+                options={ resourcesStatusOptions }
+                onChange={ _onResourcesStatusOptionsChange }
+                required={false}
+                selectedKey={optResourcesKey}
+                disabled={true}
+                defaultSelectedKey={optResourcesKey !== null ? optResourcesKey : getStatusKey(selectedProject.Resources)}
+                //defaultValue={optResourcesValue !== '' ? optResourcesValue : selectedProject.Resources}
+            />
            {/* <p>
              Select this size using <code>{`type={PanelType.${PanelType[panelType]}}`}</code>.
            </p> */}

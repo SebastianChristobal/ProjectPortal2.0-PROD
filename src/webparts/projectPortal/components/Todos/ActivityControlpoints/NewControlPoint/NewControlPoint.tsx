@@ -210,7 +210,7 @@ useEffect(() => {
 }, []); 
 
 useEffect(() => {
-    const options : IDropdownOption[] = [{ key: '1', text: 'Säkerhetskontroll'   }, {  key: '2', text: 'Kvalitetskontroll'}, {  key: '3', text: 'Brandskyddskontroll'}]
+  const options : IDropdownOption[] = [{ key: '1', text: 'Säkerhetskontroll'   }, {  key: '2', text: 'Kvalitetskontroll'}, {  key: '3', text: 'Brandskyddskontroll'}]
     setControlTypeOptions(options)
     // const fetchProjectsData = async (): Promise<any> => {
     //     try {

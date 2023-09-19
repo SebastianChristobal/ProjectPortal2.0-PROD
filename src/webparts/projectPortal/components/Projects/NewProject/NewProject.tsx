@@ -18,7 +18,7 @@ import "@pnp/sp/items/get-all";
 import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";  
-
+import { Image, IImageProps, ImageFit } from '@fluentui/react/lib/Image';
 import { IItemAddResult } from "@pnp/sp/items";
 import { spfi, SPFx } from "@pnp/sp";
 import {INewProjectProps} from './INewProjectProps';
@@ -30,6 +30,18 @@ import {
 } from "office-ui-fabric-react";
 import styles from "../../ProjectPortal.module.scss";
 import { IProject, IUser } from "../../Models";
+
+const imageProps: Partial<IImageProps> = {
+    src: 'https://braverodev.sharepoint.com/sites/Projektportalen2.0/StartPageImage/msTeams.png',
+    // Show a border around the image (just for demonstration purposes)
+    imageFit: ImageFit.contain,
+    width: 445,
+    height: 300,
+    styles: props => ({ root: { 
+       // border: '1px solid ' + props.theme.palette.neutralSecondary,
+        marginTop: '-16px' 
+    } }),
+  };
 
 const NewProject: React.FC<INewProjectProps> = (props) =>{
     const sp = spfi().using(SPFx(props.context));
@@ -208,6 +220,11 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
              </div>
         </div>
         <div className={styles.newProjectInfoText}>
+        <Image
+        width={100}
+        height={100}
+         {...imageProps} 
+         alt="Example with no image fit value and no height or width is specified." />
             <Label
              style={{fontSize:18, fontWeight: 400}}
             >
