@@ -36,29 +36,11 @@ import {
  //import * as moment from "moment";
 import {
   PrimaryButton,
-  // Label,
-  // DefaultButton
 } from "office-ui-fabric-react";
 import styles from "../../Activities.module.scss";
 import { ITodosProps } from "./ITodosProps";
 import { IActivity } from "../../../Models/IActivity";
 import { IProject } from "../../../Models";
-//import { INITIAL_PROJECT_STATE, fetchProjectReducer} from '../../FetchReducer';
-//import { ACTION_TYPES } from '../../FetchActionTypes';
-//import {ProjectService} from '../../../services/ProjectService';
-// import { IProject } from "../../../Models";
-
-
-// const cardStyles: IDocumentCardStyles = {
-//   root: { 
-//     display: 'flex',
-//     flexDirection: 'column',
-//     maxWidth: '574px',
-//     marginBottom: '10px',
-//     minWidth: '180px',
-//     width: '100%',
-//   },
-// };
 
 const Todos: React.FC<ITodosProps> = (props) =>{
 const sp = spfi().using(SPFx(props.context));
@@ -91,8 +73,6 @@ const [updateListItems, setUpdateListItems] = useState(null);
   // const getSelectedActivityItem = (selectedItem: IActivity): void => {
   //   setSelectedActivityItem(selectedItem);
   // };
-
-
   const fetchActivities = async (): Promise<any> =>{
       const currentUser = await sp.web.currentUser();
       setUpdateListItems(false);
@@ -160,67 +140,16 @@ const [updateListItems, setUpdateListItems] = useState(null);
   });
   
   }, [updateListItems])
-  // useEffect(() => {
-  //   const fetchActivityData = async (): Promise<any> => {
-  //     try {
-  //       const activityItems = await sp.web.lists
-  //         .getByTitle("Activity")
-  //         .items.select(
-  //           "Id",
-  //           "Title",
-  //           "Projekt/Title",
-  //           "Projekt/ID",
-  //           "Description",
-  //           "DueDate",
-  //           "isDone",
-  //           "Responsible/Title",
-  //           "Responsible/ID"
-  //         )
-  //         .expand("Projekt", "Responsible")
-  //         .orderBy("Modified", true)
-  //         .getAll();
-  //       const ongoingActivities = activityItems.map((activity: any) => ({
-  //         Id: activity.Id,
-  //         Title: activity.Title,
-  //         Description: activity.Description,
-  //         DueDate: moment(activity.DueDate).format("YYYY-MM-DD"),
-  //         Responsible: activity.Responsible.Title,
-  //         Projekt: activity.Projekt.Title,
-  //         isDone: activity.isDone,
-  //       })).filter(item => item.isDone !== true);
-
-  //       // const completedActivities = activityItems.map((activity: any) => ({
-  //       //   Id: activity.Id,
-  //       //   Title: activity.Title,
-  //       //   Description: activity.Description,
-  //       //   DueDate: moment(activity.DueDate).format("YYYY-MM-DD"),
-  //       //   Responsible: activity.Responsible.Title,
-  //       //   Projekt: activity.Projekt.Title,
-  //       //   isDone: activity.isDone,
-  //       // })).filter(item => item.isDone === true);
-        
-  //       setUpdateListItems(false);
-  //       //setCompletedActivities(completedActivities);
-  //       setOngoingActivities(ongoingActivities);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-  //   fetchActivityData().catch((err) => {
-  //     console.error(err);
-  //   });
-  // }, [updateListItems]);
-
- 
 
   const renderOngoingActivities = (): JSX.Element =>{
-    const activity: any = activities.length > 0 ? activities.map((items: any) =>{
+    const activity: any = activities.length > 0 ? activities.map((items: IActivity) =>{
     const project : any = currentUserProjects.length > 0 ? currentUserProjects.map((project: any) =>{
     const activityTypeName = items.ContentType.Name === 'Controlpoint' ? 'Kontrollpunkt': 'Aktivitet';
     if( items.isDone !== true ){
-          const activityTitle = `Rubrik: ${items.Title}`;
+          const activityTitle = `${items.Title}`;
           const activityContentTypeName= `Typ: ${activityTypeName}`
           const activityProject = `Projekt: ${project.Title}`;
+          const activityDescription = `Beskrivning: ${items.Description}`;
           // const activityDueDate = `Förfallodatum: ${items.DueDate1 !== undefined ? items.DueDate1 : ''}`;
           const onShowButtonText = "Visa";
           const buttonText = "Klarmarkera";
@@ -239,9 +168,7 @@ const [updateListItems, setUpdateListItems] = useState(null);
             <DocumentCardTitle title={activityTitle} className={styles.cardTitle} />
             <span key={items.Id} className={styles.cardItemProperties}>{activityProject}</span>
             <span key={items.Id} className={styles.cardItemProperties}>{activityContentTypeName}</span>
-            {/* <span key={items.Id} className={styles.cardItemProperties}>{activityManager}</span> */}
-            {/* <span key={items.Id} className={styles.cardItemProperties}>{activityDueDate}</span> */}
-            {/* <span key={items.Id} className={styles.cardItemProperties}>{activityDescription}</span> */}
+            <span key={items.Id} className={styles.cardItemProperties}>{activityDescription}</span>
             <div style={{paddingLeft: '10px', paddingTop:'5px'}}>
             <PrimaryButton
                     disabled={items.isDone}
@@ -276,6 +203,7 @@ const [updateListItems, setUpdateListItems] = useState(null);
           const activityTitle = `Rubrik: ${items.Title}`;
           const activityContentTypeName= `Typ: ${activityTypeName}`;
           const activityProject = `Projekt: ${project.Title}`;
+          const activityDescription = `Beskrivning: ${items.Description}`;
           // const activityDueDate = `Förfallodatum: ${items.DueDate1 !== undefined ? items.DueDate1 : ''}`;
           const onShowButtonText = "Visa";
           const buttonText = "Klarmarkerad";
@@ -294,9 +222,7 @@ const [updateListItems, setUpdateListItems] = useState(null);
             <DocumentCardTitle title={activityTitle} className={styles.cardTitle} />
             <span key={items.Id} className={styles.cardItemProperties}>{activityProject}</span>
             <span key={items.Id} className={styles.cardItemProperties}>{activityContentTypeName}</span>
-            {/* <span key={items.Id} className={styles.cardItemProperties}>{activityManager}</span> */}
-            {/* <span key={items.Id} className={styles.cardItemProperties}>{activityDueDate}</span> */}
-            {/* <span key={items.Id} className={styles.cardItemProperties}>{activityDescription}</span> */}
+            <span key={items.Id} className={styles.cardItemProperties}>{activityDescription}</span>
             <div style={{paddingLeft: '10px', paddingTop:'5px'}}>
             <PrimaryButton
                     disabled={items.isDone}
@@ -322,61 +248,7 @@ const [updateListItems, setUpdateListItems] = useState(null);
     }): null;
     return activity;
   }
-  // const renderCompletedActivities = (): JSX.Element =>{
-  //   const activity: any = completedActivities.length > 0 ? completedActivities.map((items: IActivity) =>{
-  //     const activityTitle = `Rubrik: ${items.Title}`;
-  //     const activityProject = `Projekt: ${items.Projekt}`;
-  //     const activityDescription = `Beskrivning: ${items.Description}`
-  //     const activityManager = `Ansvarig: ${items.Responsible}`;
-  //     //const activityDueDate = `Förfallodatum: ${items.DueDate}`;
-  //     const isDone: boolean = items.isDone;
-  //     const onShowButtonText = "Visa";
-  //     const buttonText = isDone === true ? "Klarmarkerad" : "Klarmarkera";
-  //     return(<DocumentCard
-  //       key={items.Id}
-  //       type={DocumentCardType.compact}
-  //      // onClick={() => this.onOpenPanelHandler(items)}
-  //       style={{
-  //         maxWidth: '100%',
-  //         height: '100%',
-  //         marginTop: '15px',
-  //         padding: '5px'
-  //       }}
-  //     >
-  //       <DocumentCardDetails  >        
-  //       <DocumentCardTitle title={activityTitle} className={styles.cardTitle} />
-  //       <span key={items.Id} className={styles.cardItemProperties}>{activityProject}</span>
-  //       <span key={items.Id} className={styles.cardItemProperties}>{activityManager}</span>
-  //       {/* <span key={items.Id} className={styles.cardItemProperties}>{activityDueDate}</span> */}
-  //       <span key={items.Id} className={styles.cardItemProperties}>{activityDescription}</span>
-  //       <div style={{paddingLeft: '10px', paddingTop:'5px'}}>
-  //       <PrimaryButton
-  //               disabled={items.isDone}
-  //               text={buttonText}
-  //               onClick={() => onActivityDone(items)}
-  //             />
-  //             <PrimaryButton
-  //               style={{
-  //                 width: "119px",
-  //                 marginTop: "5px",
-  //                 marginLeft: '5px'
-  //               }}
-  //               disabled={false}
-  //               text={onShowButtonText}
-  //               // onClick={() => getSelectedActivityItem(items)}
-  //             />
-  //       </div>
-  //       </DocumentCardDetails>
-  //     </DocumentCard>)
-      
-  //   }) : null;
-
-  //   return activity;
-  // }
-  console.log(activities);
-  console.log(updateListItems);
- // console.log(projectState);
-
+ 
  return( <div>
         <Pivot
         defaultSelectedKey={"0"}

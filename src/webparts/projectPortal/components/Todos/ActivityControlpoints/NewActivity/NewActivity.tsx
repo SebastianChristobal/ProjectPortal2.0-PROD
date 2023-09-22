@@ -72,7 +72,7 @@ const NewActivity: React.FC<INewTodoProps> = (props) =>{
 
   const onSaveActivty = async (): Promise<any>  => {
     const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
-    const selectedManager = manager.map((items: IUser) =>{return items.id})[0];
+    const selectedManager = manager.map((items: IUser) =>{return items.Id})[0];
     const selectedUser = await web.ensureUser(selectedManager);
     const contentTypes : IContentType[]  = await web.lists.getByTitle("Activities").items.select('ContentType/Id,ContentType/Name').expand('ContentType').getAll();
     const contentType = contentTypes.find(contentType => 
@@ -227,7 +227,7 @@ return(<React.Fragment>
                 disabled={
                 !titleValue || 
                 !descValue || 
-                !manager.map((items: IUser) =>{return items.id})[0]  ||
+                !manager.map((items: IUser) =>{return items.Id})[0]  ||
                 !selectedDateValue 
             }
                 onClick={ onSaveActivty }

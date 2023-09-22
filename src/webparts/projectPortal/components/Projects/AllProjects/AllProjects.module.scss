@@ -10,7 +10,7 @@
     width: 100;
     height: auto;
     position: static;
-    padding-top: 30px;
+    padding-top: 10px;
   }
 .pivotWrapper{
   @include ms-Grid-col;
@@ -30,7 +30,7 @@
       @include ms-lgPush1;
       height: auto;
       padding: 15px 15px 15px 15px;
-      background-color: #c3c3c36e;
+      background-color: #f1f1f16e;
 }
 .allProjectsHeaderText{
         font-size: 18;

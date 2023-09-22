@@ -12,6 +12,7 @@ export interface IActivity{
     ResponsibleId?: any; 
     DueDate1?: any;
     ContentTypeId?: any;
+    ContentType?: any;
 }
 
 export interface IContentType {

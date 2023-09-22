@@ -13,6 +13,7 @@ import { TextField } from '@fluentui/react/lib/TextField';
 //     // Label,
 //     // DefaultButton
 //   } from "office-ui-fabric-react";
+import { ProgressStepsIndicator } from '@pnp/spfx-controls-react/lib/ProgressStepsIndicator';
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
@@ -22,6 +23,7 @@ import "@pnp/sp/site-users/web";
 import "@pnp/sp/profiles";
 import '@pnp/graph/groups';
 import "@pnp/graph/members";
+import { IItemAddResult } from "@pnp/sp/items";
 import { FontIcon } from '@fluentui/react/lib/Icon';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
 import { Panel, PanelType } from '@fluentui/react/lib/Panel';
@@ -32,40 +34,58 @@ import {
   IDropdownOption
 } from '@fluentui/react/lib/Dropdown';
 import { spfi, SPFx,  } from "@pnp/sp";
+import { 
+  PeoplePicker, 
+  PrincipalType 
+} from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { IProjectDetailProps } from "./IProjectDetailProps";
-import { Label } from "office-ui-fabric-react";
+import {
+   DefaultButton, 
+  //  Label, 
+   PrimaryButton
+   } from "office-ui-fabric-react";
 import styles from "./ProjectDetail.module.scss"
-import { IProject } from "../../Models";
+import { IProject, IUser } from "../../Models";
+import { IStep } from "../../Models/IStep";
 // const theme = getTheme();
 // const { palette, fonts } = theme;
+import PnPTelemetry from "@pnp/telemetry-js";
+const telemetry = PnPTelemetry.getInstance();
+telemetry.optOut();
 
 const iconClass = mergeStyles({
-  fontSize: 17,
+  fontSize: 22,
   height: 17,
   width: 15,
   marginLeft: '32px',
   marginRight: '30px'
 });
+const buttonStyles = { root: { marginRight: 8 } };
+
 
 const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
     const sp = spfi().using(SPFx(props.context));
-    //const [titleValue, setTitleValue] = useState<string>(''); 
     const [customerValue, setCustomerValue] = useState<string>('');  
     const [selectedProject, setSelectedProject] = useState<IProject>({});
     const [isOpen, setIsOpen] = useState(false);
     const [budgetstatusOptions, setBudgetstatusOptions] = useState<IDropdownOption[]>([]);
     const [timeStatusOptions, setTimeStatusOptions] = useState<IDropdownOption[]>([]);
     const [resourcesStatusOptions, setResourcesStatusOptions] = useState<IDropdownOption[]>([]);
-    //const [optBudgetValue, setOptBudgetValue] = useState<any>('');
-    //const [optTimeValue, setOptTimeValue] = useState<any>('');
-    //const [optResourcesValue, setOptResourcesValue] = useState<any>('');
-    const [optBudgetKey, setOptBudgetKey] = useState<any>(null);
-    const [optResourcesKey, setOptResourcesKey] = useState<any>(null);
-    const [optTimeKey, setOptTimeKey] = useState<any>(null);
-   
-    // const _onTitleTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
-    //   setTitleValue(newValue);
-    // }
+    const [onDisableEdit, setOnDisableEdit] = useState(true);
+    const [optBudgetKey, setOptBudgetKey] = useState(null);
+    const [optResourcesKey, setOptResourcesKey] = useState(null);
+    const [optTimeKey, setOptTimeKey] = useState(null);
+    const [projectLeader, setProjectLeader] = useState([]);
+    const [projectManager, setProjectManager] = useState([]);
+    const [projectMember, setProjectMember] = useState([]);
+    const [defaultProjectLeader, setDefaultProjectLeader] = useState<IUser>({});
+    const [defaultProjectManager, setDefaultProjectManager] = useState<IUser>({});
+    const [defaultMembers, setDefaultMembers] = useState<IUser[]>([]);
+    const [progressSteps, setProgressSteps] = useState<IStep[]>([]);
+    const _getProjectLeader = (props: IUser[]): void => {  setProjectLeader(props);}
+    const _getProjectManager = (props: IUser[]): void => {  setProjectManager(props);}
+    const _getProjectMembers = (props: IUser[]): void => {  setProjectMember(props);}
+  
     const _onCustomerTextFieldChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string): void =>{
       setCustomerValue(newValue);
     }
@@ -73,7 +93,11 @@ const ProjectDetail: React.FC<IProjectDetailProps> = (props) =>{
       setIsOpen(true)
     }
     const dismissPanel = (): void => {
+      setOnDisableEdit(true);
       setIsOpen(false);
+    }
+    const onEnableEdit = (): void =>{
+      setOnDisableEdit(false);
     }
     const _onTimeStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void => {
       //setOptTimeValue(option.text);
@@ -87,7 +111,54 @@ const _onBudgetStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, op
   //setOptBudgetValue(option.text);
   setOptBudgetKey(option.key);
 }
-    const fetchSelectedProject = async (): Promise<any> => {
+
+  const onSave = async ():Promise<any> =>{
+    const projectId: number = selectedProject.Id;
+    const leader: string =  projectLeader.length > 0 ? projectLeader[0].loginName.match(/[^|]+$/)[0] : defaultProjectLeader.EMail;
+    const manager: string = projectManager.length > 0 ? projectManager[0].loginName.match(/[^|]+$/)[0] : defaultProjectManager.EMail;
+    const members : string[] = projectMember.length > 0 ? projectMember[0].loginName.match(/[^|]+$/)[0]: defaultMembers.map((EMail) => {return EMail});
+    const selectedProjectLeader = await sp.web.ensureUser(leader);
+    const selectedProjectManager = await sp.web.ensureUser(manager);
+    const projectMembers: number[] = [];
+    members.map( async (loginName: string) => {
+    const selectedProjectMembers = await sp.web.ensureUser(loginName);
+    projectMembers.push(selectedProjectMembers.data.Id); // Push the Id into the array
+  });
+  
+    const project: IProject ={
+      Customer: customerValue,
+      Budget: optBudgetKey,
+      Resources: optResourcesKey,
+      Time: optTimeKey,
+      ProjectLeaderId: selectedProjectLeader.data.Id,
+      ProjectManager: selectedProjectManager.data.Id,
+      ProjectMembers: projectMembers
+
+    }
+    try{
+      const iar: IItemAddResult = await sp.web.lists.getByTitle("Projekt").items.getById(projectId).update(project);
+      console.log(iar);
+    }
+    catch (err) {console.error(err);}
+  }
+  const getDefualtUsers = (selectedProject: any): any =>{
+    let projectLeader : IUser = {};
+    let projectManager : IUser = {};
+    let members: IUser[] = [];
+    if(selectedProject !== undefined){
+      projectLeader = selectedProject.ProjectLeader;
+      projectManager = selectedProject.ProjectManager;
+      members = selectedProject.ProjectMembers.map((member: any) => {return member});
+    }
+    else{
+      console.log("selectedProject.Manager is undefined or null.");
+    }
+    setDefaultProjectLeader(projectLeader);
+    setDefaultProjectManager(projectManager);
+    setDefaultMembers(members);
+    return;
+  }
+    const fetchSelectedProject = async (): Promise<IProject> => {
       try {
           const currentUrl = window.location.href.split('/');
           const projectId = parseInt(currentUrl[currentUrl.length - 1]);
@@ -96,13 +167,16 @@ const _onBudgetStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, op
             'Title', 
             'ProjectType/Title',
             'ProjectType/ID',
-            'Customer',
-            'ProjectManager/Title',
-            'ProjectMembers/Title',
-            'ProjectMembers/ID',
+            'Customer',         
             'ProjectManager/ID',
-            'ProjectLeader/Title',
+            'ProjectManager/Title',
+            'ProjectManager/EMail',
+            'ProjectMembers/ID',
+            'ProjectMembers/Title',
+            'ProjectMembers/EMail',
             'ProjectLeader/ID',
+            'ProjectLeader/Title',
+            'ProjectLeader/EMail',
             'ProjectImage',
             'Status',
             'Budget',
@@ -111,11 +185,30 @@ const _onBudgetStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, op
             )
             .expand('ProjectManager', 'ProjectLeader', 'ProjectType', 'ProjectMembers')();
            setSelectedProject(selectedProject);
+           getDefualtUsers(selectedProject);
           }
         catch (error) {
           console.error(error);
    }
+    return;
   };
+
+    const fetchProgressSteps = async (): Promise<any> =>{
+      const progressSteps: IStep[] = [];
+      try{
+          const fas = await sp.web.lists.getByTitle('Faser').items.getAll();
+          fas.map((item) =>{
+            progressSteps.push({
+              description: item.Description,
+              title: item.Title
+            })
+          })
+          setProgressSteps(progressSteps);
+      }catch (error) {
+        console.error(error);
+      }
+      return;
+    } 
     
     useEffect(() => {
       fetchSelectedProject().catch((err) => {
@@ -130,9 +223,20 @@ const _onBudgetStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, op
       setResourcesStatusOptions(options);
     }, []);
 
+    useEffect(() => {
+      fetchProgressSteps().catch((err) => {
+        console.error(err);
+    });
+    }, []);
+
+    const renderProjectImage = (): JSX.Element =>{
+      if(selectedProject.ProjectImage !== undefined){
+        return <img width={'100%'} height={'100%'} src={selectedProject.ProjectImage} />
+      }
+     }
    const renderSelectedProject = ():JSX.Element =>{
     if(selectedProject.Title !== undefined){
-      const projectMembers = selectedProject.ProjectMembers.map((members: any) => {return members.Title});
+      const projectMembers = selectedProject.ProjectMembers.map((members: IUser) => {return members.Title});
       const selectedProjectLeader = `Projektledare: ${selectedProject.ProjectLeader.Title}`
       const selectedProjectManager = `Projektansvarig: ${selectedProject.ProjectManager.Title}`
       const selectedProjectMemebers = `Projektmedlemmar: ${projectMembers}`
@@ -169,12 +273,7 @@ const _onBudgetStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, op
     }
    }
 
-   const renderProjectImage = (): JSX.Element =>{
-    if(selectedProject.ProjectImage !== undefined){
-      return <img width={'100%'} height={'100%'} src={selectedProject.ProjectImage} />
-    }
-   }
-   const getStatusKey = (status: any): any => { 
+   const getStatusKey = (status: string): any => { 
     switch (status) {
       case 'Low':
         return '1';
@@ -186,9 +285,7 @@ const _onBudgetStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, op
         return '0'; // You can set a default color for other cases
     }
   };
-  
-   
-   const getStatusColor = (status: any): any => { 
+   const getStatusColor = (status: string): any => { 
     switch (status) {
       case 'Low':
         return 'green';
@@ -200,9 +297,6 @@ const _onBudgetStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, op
         return 'gray'; // You can set a default color for other cases
     }
   };
-  
-  
-
    const renderProjectStatuses = (): JSX.Element =>{
     if (selectedProject.Title !== undefined) {
       return (
@@ -223,26 +317,38 @@ const _onBudgetStatusOptionsChange = (event: React.FormEvent<HTMLDivElement>, op
       );
     }
    }
+   const onRenderFooterContent = React.useCallback(
+    () => (
+      <div>
+        { !onDisableEdit && <PrimaryButton onClick={onSave} styles={buttonStyles}>
+          Spara
+        </PrimaryButton>}
+        {onDisableEdit && <PrimaryButton text="Redigera" onClick={onEnableEdit} styles={buttonStyles} />}
+        <DefaultButton onClick={dismissPanel}>Avbryt</DefaultButton>
+      </div>
+    ),
+    [dismissPanel],
+  );
 
-console.log(selectedProject);
-console.log(optBudgetKey);
 return(<React.Fragment>
       <div className={styles.ProjectDetailsPage}>
         {
            <Panel
            isOpen={isOpen}
            onDismiss={dismissPanel}
-           type={PanelType.smallFixedFar}
+           type={PanelType.largeFixed}
            //customWidth={panelType === PanelType.custom || panelType === PanelType.customNear ? '888px' : undefined}
            closeButtonAriaLabel="Stäng"
            headerText="Redigera"
+           onRenderFooterContent={onRenderFooterContent}
          >
             <TextField 
              label="Kund"
              // errorMessage="Error message" 
-             value={ customerValue !== '' ? customerValue : selectedProject.Customer  }
+             defaultValue={customerValue !== '' ? customerValue : selectedProject.Customer}
              required={false}
-             disabled={true}
+             disabled={onDisableEdit}
+             
              onChange={ _onCustomerTextFieldChange }
              />
                 <Dropdown
@@ -253,7 +359,7 @@ return(<React.Fragment>
                 required={false}
                 defaultSelectedKey={optBudgetKey !== null ? optBudgetKey : getStatusKey(selectedProject.Budget)}
                 selectedKey={optBudgetKey}
-                disabled={true}
+                disabled={onDisableEdit}
                 //defaultValue={optBudgetValue !== '' ? optBudgetValue : selectedProject.Budget}
             />
                <Dropdown
@@ -263,7 +369,7 @@ return(<React.Fragment>
                 onChange={ _onTimeStatusOptionsChange }
                 required={false}
                 selectedKey={optTimeKey}
-                disabled={true}
+                disabled={onDisableEdit}
                 defaultSelectedKey={optTimeKey !== null ? optTimeKey : getStatusKey(selectedProject.Time)}
                 //defaultValue={optTimeValue !== '' ? optTimeValue : selectedProject.Time}
             />
@@ -274,16 +380,59 @@ return(<React.Fragment>
                 onChange={ _onResourcesStatusOptionsChange }
                 required={false}
                 selectedKey={optResourcesKey}
-                disabled={true}
+                disabled={onDisableEdit}
                 defaultSelectedKey={optResourcesKey !== null ? optResourcesKey : getStatusKey(selectedProject.Resources)}
                 //defaultValue={optResourcesValue !== '' ? optResourcesValue : selectedProject.Resources}
             />
+              <PeoplePicker
+              context={props.context}
+              titleText="Projektledare"
+              personSelectionLimit={1}
+              //showtooltip={true}
+              disabled={onDisableEdit}
+              required={true}
+              onChange={ _getProjectLeader}
+              defaultSelectedUsers={projectLeader.length > 0 ? projectLeader.map((user) => {return user.text}): [defaultProjectLeader.Title]}
+              //showHiddenInUI={false}
+               principalTypes={[PrincipalType.User]}
+            //defaultSelectedUsers={this.state.selectedUsers}
+             resolveDelay={1000} 
+             />
+               <PeoplePicker
+              context={props.context}
+              titleText="Projektansvarig"
+              personSelectionLimit={1}
+              //showtooltip={true}
+              disabled={onDisableEdit}
+              required={true}
+              onChange={ _getProjectManager }
+              defaultSelectedUsers={projectManager.length > 0 ? projectManager.map((user) => {return user.text}) : [defaultProjectManager.Title]}
+              //showHiddenInUI={false}
+               principalTypes={[PrincipalType.User]}
+            //defaultSelectedUsers={this.state.selectedUsers}
+             resolveDelay={1000} 
+             />
+              <PeoplePicker
+              context={props.context}
+              titleText="Projektmedlemmar"
+              //personSelectionLimit={1}
+              //showtooltip={true}
+              disabled={onDisableEdit}
+              required={true}
+              onChange={ _getProjectMembers }
+              defaultSelectedUsers={projectMember.length > 0 ? projectMember.map((user) => {return user.text}): defaultMembers.map((member) => {return member.Title})}
+              //showHiddenInUI={false}
+               principalTypes={[PrincipalType.User]}
+            //defaultSelectedUsers={this.state.selectedUsers}
+             resolveDelay={1000} 
+             />
            {/* <p>
              Select this size using <code>{`type={PanelType.${PanelType[panelType]}}`}</code>.
            </p> */}
          </Panel>
         }
-         <div className={styles.projectDetailsAndFasWrapper}>
+        <div className={styles.projectDetailsAndFasWrapper}>
+         <div style={{boxShadow: 'rgba(0, 0, 0, 0.4) 0px 0px 5px 0px', width: '99%'}}>
           <div className={styles.projectDetailsWrapper}>
             <div className={styles.projectDetailColumnOne}>
                 {renderSelectedProject()}
@@ -294,20 +443,23 @@ return(<React.Fragment>
             <div className={styles.projectDetailColumnThree} >
                  {renderProjectImage()}
           </div>     
-        </div>
+        </div >
          <div className={styles.projectFasWrapper}>
-                <div>
-                            <Label
-                            style={{fontSize:18, fontWeight: 500}}
-                            >
-                            ProjektFaser</Label>
-                        </div>
-                    </div>
+            <div style={{padding: '35px 30px 30px 35px'}}>
+                {/* <Label style={{fontSize:18, fontWeight: 500}}>ProjektFaser</Label> */}
+                <ProgressStepsIndicator steps={progressSteps} currentStep={1} themeVariant={props.themeVariant}    />
             </div>
-            <div className={styles.projectDetailButtonsWrapper}>
-            knappar
+          </div>
             </div>
-            <div className={styles.projectListItemsAndDocWrapper}>
+          </div>  
+          <div className={styles.projectDetailButtonsWrapper}>
+            <div style={{ display: 'flex', flexFlow: 'column'}} >
+            <PrimaryButton width={100} text="Registrera aktivitet"/>
+            <PrimaryButton width={100} style={{marginTop: '5px'}}  text="Registrera kontrollpunkt"/>
+            <PrimaryButton width={100} style={{marginTop: '5px'}}  text="Registrera ÄTA"/>
+            </div>
+          </div>
+            {/* <div className={styles.projectListItemsAndDocWrapper}>
             <div className={styles.controllPointColumn}>
                     Kontrollpukter
             </div>
@@ -320,7 +472,7 @@ return(<React.Fragment>
             <div className={styles.documentColumn}>
                     Docs
             </div>
-            </div>
+            </div> */}
         </div></React.Fragment>);
 }
 

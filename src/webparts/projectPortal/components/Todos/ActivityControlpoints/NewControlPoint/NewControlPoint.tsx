@@ -116,7 +116,7 @@ const uploadFiles = async (files: any, selectedItemId: any): Promise<any> => {
 
 const onSaveControlPoint = async (): Promise<any>  => {
   const web = Web(selectedProjectWebUrl).using(SPFx(props.context));
-  const implementedByUser = implementedBy.map((items: IUser) =>{return items.id})[0];
+  const implementedByUser = implementedBy.map((items: IUser) =>{return items.Id})[0];
   const selectedUser = await sp.web.ensureUser(implementedByUser);
   const contentTypes : IContentType[] = await web.lists.getByTitle("Activities").items.select('ContentType/Id,ContentType/Name').expand('ContentType').getAll();
   const contentType = contentTypes.find(contentType => 
@@ -310,7 +310,7 @@ useEffect(() => {
                   !projectOptionsValue || 
                   !selectedDateValue || 
                   !optControlTypeValue ||
-                  !implementedBy.map((items: IUser) =>{return items.id})[0] 
+                  !implementedBy.map((items: IUser) =>{return items.Id})[0] 
                 }
              />
              </div>
@@ -322,7 +322,7 @@ useEffect(() => {
                   !projectOptionsValue || 
                   !selectedDateValue || 
                   !optControlTypeValue ||
-                  !implementedBy.map((items: IUser) =>{return items.id})[0] 
+                  !implementedBy.map((items: IUser) =>{return items.Id})[0] 
                 }
                 text="Skapa genomförd kontroll"
                 onClick={ onSaveControlPoint}

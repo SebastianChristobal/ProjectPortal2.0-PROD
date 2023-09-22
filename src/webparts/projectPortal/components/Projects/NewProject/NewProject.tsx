@@ -35,8 +35,8 @@ const imageProps: Partial<IImageProps> = {
     src: 'https://braverodev.sharepoint.com/sites/Projektportalen2.0/StartPageImage/msTeams.png',
     // Show a border around the image (just for demonstration purposes)
     imageFit: ImageFit.contain,
-    width: 445,
-    height: 300,
+    width: '100%',
+    height: 285,
     styles: props => ({ root: { 
        // border: '1px solid ' + props.theme.palette.neutralSecondary,
         marginTop: '-16px' 
@@ -69,11 +69,11 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
     }
 
     const onSaveProject = async (): Promise<any>  => {
-        const projectManagerUser = projectManager.map((items: IUser) =>{return items.id})[0];
-        const responsibleManagerUser = responsibleManager.map((items: IUser) =>{return items.id})[0];
+        const projectManagerUser = projectManager.map((items: IUser) =>{return items.Id})[0];
+        const responsibleManagerUser = responsibleManager.map((items: IUser) =>{return items.Id})[0];
         const projectMembersUser: number[] = [];
         projectMembers.map( async (items: IUser) => {
-            const selectedProjectMembers = await sp.web.ensureUser(items.id);
+            const selectedProjectMembers = await sp.web.ensureUser(items.Id);
             projectMembersUser.push(selectedProjectMembers.data.Id); // Push the Id into the array
         });
         const selectedProjectManager = await sp.web.ensureUser(projectManagerUser);
@@ -88,7 +88,7 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
             ProjectMembersId: projectMembersUser
         }
         try{
-             const iar: IItemAddResult = await sp.web.lists.getByTitle("Projekt").items.add(project)
+             const iar: IItemAddResult = await sp.web.lists.getByTitle("Projekt").items.add(project);
              setTitleValue('');
              setCustomerValue('');
              setOptValue(null);
@@ -211,9 +211,9 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
                     !titleValue ||
                     !customerValue ||
                     !optValue ||
-                    !projectManager.map((items: IUser) =>{return items.id})[0] ||
-                    !responsibleManager.map((items: IUser) =>{return items.id})[0] ||
-                    !projectMembers.map((items: IUser) =>{return items.id})[0]
+                    !projectManager.map((items: IUser) =>{return items.Id})[0] ||
+                    !responsibleManager.map((items: IUser) =>{return items.Id})[0] ||
+                    !projectMembers.map((items: IUser) =>{return items.Id})[0]
                 }
                 onClick={ onSaveProject}
                 />

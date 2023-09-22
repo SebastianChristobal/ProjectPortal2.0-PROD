@@ -14,7 +14,7 @@ import {
     PivotLinkFormat, 
     PivotLinkSize
 } from  'office-ui-fabric-react';
-import { Image, IImageProps } from '@fluentui/react/lib/Image';
+//import { Image, IImageProps } from '@fluentui/react/lib/Image';
 import NewProject from './Projects/NewProject/NewProject';
 import Start from './Start/Start';
 import ProjectDetail from './Projects/ProjectDetails/ProjectDetail';
@@ -25,11 +25,11 @@ import NewTodo from './Todos/ActivityControlpoints/NewActivity/NewActivity';
 
 const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps) =>{
   const {SPHttpClient, context, siteAbsolutetUrl} = props;
-  const imageProps: Partial<IImageProps> = {
-    src: 'https://braverodev.sharepoint.com/sites/Projektportalen2.0/StartPageImage/portalImg.png',
-    // Show a border around the image (just for demonstration purposes)
-    styles: props => ({ root: { border: '1px solid ' + props.theme.palette.neutralSecondary } }),
-  };
+  // const imageProps: Partial<IImageProps> = {
+  //   src: 'https://braverodev.sharepoint.com/sites/Projektportalen2.0/StartPageImage/portalImg.png',
+  //   // Show a border around the image (just for demonstration purposes)
+  //   styles: props => ({ root: { border: '1px solid ' + props.theme.palette.neutralSecondary } }),
+  // };
   
   const handleLinkClick = (item: PivotItem):void =>{
     if(item.props.itemKey === 'Start'){
@@ -54,9 +54,9 @@ const ProjectPortal: React.FC<IProjectPortalProps> = (props: IProjectPortalProps
 
   return(
   <div className={styles.projectPortal}>
-    <div className={styles.portalImage}>
+    {/* <div className={styles.portalImage}>
     <Image {...imageProps} style={{ width :'100%', height: 'auto'}} alt="Example with no image fit value and no height or width is specified." />
-    </div>
+    </div> */}
       <div className={styles.NavigationWrapper}>
       <Pivot 
           defaultSelectedKey={"0"}

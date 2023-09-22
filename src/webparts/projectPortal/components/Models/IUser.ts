@@ -1,10 +1,12 @@
 export interface IUser{
-id: string;
-imageInitials: string; 
-imageUrl: string;
-loginName: string;
-optionalText: string;
-secondaryText: string;
-tertiaryText: string;
-text: string; 
+Id?: string;
+Title?: string;
+imageInitials?: string; 
+imageUrl?: string;
+loginName?: string;
+optionalText?: string;
+secondaryText?: string;
+tertiaryText?: string;
+text?: string; 
+EMail?: string;
 }
