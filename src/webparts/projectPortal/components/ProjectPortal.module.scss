@@ -11,12 +11,13 @@
 }
 .NavigationWrapper{
   @include ms-Grid-col;
-  @include ms-lg10;
-  @include ms-xl10;
+  @include ms-lg12;
+  @include ms-xl12;
   @include ms-sm12;
   @include ms-xlPush2;
   @include ms-lgPush1;
   background-color: none;
+  position: static;
 }
 .welcome {
   text-align: center;
@@ -31,16 +32,17 @@
   width: 100;
   height: auto;
   position: inherit;
-  padding: 10px 30px 30px 30px;
+  padding: 10px 5px 10px 5px;
 }
 .newProjectTopNav{
 @include ms-Grid-col;
-  @include ms-lg10;
-  @include ms-xl10;
+  @include ms-lg12;
+  @include ms-xl12;
   @include ms-sm12;
   @include ms-xlPush2;
   @include ms-lgPush1;
   height: auto;
+  position: static;
   padding: 5px 5px 5px 5px;
   background-color: #f1f1f16e;
 }
@@ -57,13 +59,14 @@
 .newProjectForm{
   box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 5px 0px;
   @include ms-Grid-col;
-  @include ms-lg6;
-  @include ms-xl6;
+  @include ms-lg8;
+  @include ms-xl8;
   @include ms-sm12;
   @include ms-xlPush2;
   @include ms-lgPush1;
   padding: 30px 30px 30px 30px;
-  margin-top: 40px
+  margin-top: 40px;
+  position: static;
 }
 
 .newProjectWrapper{
@@ -86,21 +89,23 @@
 }
 .myProjectsColumn{
   @include ms-Grid-col;
-  @include ms-lg3;
-  @include ms-xl3;
+  @include ms-lg4;
+  @include ms-xl4;
   @include ms-sm12;
   @include ms-xlPush2;
   @include ms-lgPush1;
   margin-top: 40px;
+  position: static;
 }
 .myActivitiesColumn{
   @include ms-Grid-col;
-  @include ms-lg7;
-  @include ms-xl7;
+  @include ms-lg8;
+  @include ms-xl8;
   @include ms-sm12;
   @include ms-xlPush2;
   @include ms-lgPush1;
-  margin-top: 40px
+  margin-top: 40px;
+  position: static;
 }
 .newProjectHeaderText{
   font-size: 18;
@@ -115,7 +120,8 @@
   @include ms-lgPush1;
   font-size: 18;
   font-weight: 400;
-  padding: 30px 30px 30px 30px;
+  padding: 40px 0px 15px 16px;
+  position: static;
 }
 .documentCardTitle{
   height: 23px;

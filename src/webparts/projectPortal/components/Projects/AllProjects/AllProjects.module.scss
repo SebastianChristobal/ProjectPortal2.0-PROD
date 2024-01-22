@@ -14,38 +14,40 @@
   }
 .pivotWrapper{
   @include ms-Grid-col;
-  @include ms-lg10;
-  @include ms-xl10;
+  @include ms-lg12;
+  @include ms-xl12;
   @include ms-sm12;
   @include ms-xlPush2;
   @include ms-lgPush1;
   padding: 30px 0px 30px 0px;
+  position: static;
 }
 .allProjectsTopNav{
     @include ms-Grid-col;
-      @include ms-lg10;
-      @include ms-xl10;
+      @include ms-lg12;
+      @include ms-xl12;
       @include ms-sm12;
       @include ms-xlPush2;
       @include ms-lgPush1;
       height: auto;
-      padding: 15px 15px 15px 15px;
+      position: static;
+      padding: 5px 5px 5px 5px;
       background-color: #f1f1f16e;
 }
 .allProjectsHeaderText{
-        font-size: 18;
-        font-weight: 400;
+  font-size: 18;
+  font-weight: 400;
 }    
 .allProjectsInfoText{
-    @include ms-Grid-col;
-    @include ms-lg4;
-    @include ms-xl4;
-    @include ms-sm12;
-    @include ms-xlPush2;
-    @include ms-lgPush1;
-    font-size: 18;
-    font-weight: 400;
-    padding: 30px 30px 30px 30px;
+  @include ms-Grid-col;
+  @include ms-lg4;
+  @include ms-xl4;
+  @include ms-sm12;
+  @include ms-xlPush2;
+  @include ms-lgPush1;
+  font-size: 18;
+  font-weight: 400;
+  padding: 30px 30px 30px 30px;
   }
   .imageWrapper{
     background-color: #e7e7e7;

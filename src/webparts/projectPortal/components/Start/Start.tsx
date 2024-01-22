@@ -22,9 +22,9 @@ const Start : React.FC<IStartProps> = (props: IStartProps) =>{
                 <Label
                 style={{fontSize:18, fontWeight: 400}}
                 >
-                    Här kan du se vilka projekt du är ägare av eller medlem i, du kan även se dina aktiviteter kopplade till projekten.
+                Här kan du se vilka projekt du är ägare av eller medlem i, du kan även se dina aktiviteter kopplade till projekten.
                </Label>
-               <div style={{float:'right'}}>
+               <div style={{float:'right', marginRight: '7px', height: '30px', marginBottom: '10px'}}>
                 <PrimaryButton text="Nytt projekt" iconProps={addIcon} />
                </div>
             </div>
@@ -34,7 +34,7 @@ const Start : React.FC<IStartProps> = (props: IStartProps) =>{
             <MyProject {...props} />
         </div>
         <div className={styles.myActivitiesColumn}>
-            <Activities {...props} />
+        <Activities {...props} />
         </div>
         </div>
     </div></React.Fragment>);

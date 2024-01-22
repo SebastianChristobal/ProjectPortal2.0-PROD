@@ -123,8 +123,8 @@ const MyProject: React.FC<IMyProjectsProps> = (props) =>{
                 <DocumentCardImage height={150}  imageFit={ImageFit.cover} imageSrc={project.ProjectImage}  />
                 </div>
                 <DocumentCardDetails  className={styles.documentCardTitle} >
-                  <div>{project.Title}</div>
-                  <div>{project.Customer}</div>
+                  <div>Title: {project.Title}</div>
+                  <div>Customer: {project.Customer}</div>
                 </DocumentCardDetails>               
               </DocumentCard>
               </Label>

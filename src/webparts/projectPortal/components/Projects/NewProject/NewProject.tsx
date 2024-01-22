@@ -32,7 +32,7 @@ import styles from "../../ProjectPortal.module.scss";
 import { IProject, IUser } from "../../Models";
 
 const imageProps: Partial<IImageProps> = {
-    src: 'https://braverodev.sharepoint.com/sites/Projektportalen2.0/StartPageImage/msTeams.png',
+    src: 'https://ionii.sharepoint.com/sites/Projektportalen/Shared%20Documents/newProject.png',
     // Show a border around the image (just for demonstration purposes)
     imageFit: ImageFit.contain,
     width: '100%',
@@ -69,11 +69,11 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
     }
 
     const onSaveProject = async (): Promise<any>  => {
-        const projectManagerUser = projectManager.map((items: IUser) =>{return items.Id})[0];
-        const responsibleManagerUser = responsibleManager.map((items: IUser) =>{return items.Id})[0];
+        const projectManagerUser = projectManager.map((items: IUser) =>{return items.id})[0];
+        const responsibleManagerUser = responsibleManager.map((items: IUser) =>{return items.id})[0];
         const projectMembersUser: number[] = [];
         projectMembers.map( async (items: IUser) => {
-            const selectedProjectMembers = await sp.web.ensureUser(items.Id);
+            const selectedProjectMembers = await sp.web.ensureUser(items.id);
             projectMembersUser.push(selectedProjectMembers.data.Id); // Push the Id into the array
         });
         const selectedProjectManager = await sp.web.ensureUser(projectManagerUser);
@@ -210,10 +210,11 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
                 disabled={
                     !titleValue ||
                     !customerValue ||
-                    !optValue ||
-                    !projectManager.map((items: IUser) =>{return items.Id})[0] ||
-                    !responsibleManager.map((items: IUser) =>{return items.Id})[0] ||
-                    !projectMembers.map((items: IUser) =>{return items.Id})[0]
+                    !optValue 
+                    //||
+                    // !projectManager.map((items: IUser) =>{return items.Id})[0] ||
+                    // !responsibleManager.map((items: IUser) =>{return items.Id})[0] ||
+                    // !projectMembers.map((items: IUser) =>{return items.Id})[0]
                 }
                 onClick={ onSaveProject}
                 />

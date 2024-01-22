@@ -194,7 +194,7 @@ const AllProjects : React.FC<IAllProjectsProps> = (props) =>{
             <div className={styles.allProjectsTopNav}>
                 <div>
                     <Label
-                    style={{fontSize:20, fontWeight: 500, marginBottom:10}}
+                    style={{fontSize:24, fontWeight: 600, marginBottom:10}}
                     >
                     Här kan vi se alla Projekt som har skapats.</Label>
                 </div>
