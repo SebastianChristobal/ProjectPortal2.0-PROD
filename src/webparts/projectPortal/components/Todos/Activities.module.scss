@@ -1,18 +1,51 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
 .cardTitle {
-  font-size: 16px;
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
   color: black;
   font-weight: 600;
   height: auto;
   padding: 4px 0px 2px 16px;
 }
+.cardProjectTitle{
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-family: "Helvetica Neue", Helvetica, Arial;
+  color: black;
+  font-weight: 600;
+  height: auto;
+  padding: 4px 0px 2px 16px;
+}
+.cardContentType{
+  font-size: 16px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: white;
+  background-color: rgb(42, 43, 53);
+  padding: 2px 16px 2px 16px;
+  margin-left: 15px;
+  width: fit-content;
+}
+.cardDesc{
+  font-size: 16px;
+  color: black;
+  font-weight: 400;
+  height: auto;
+  padding: 4px 0px 2px 16px;
+ 
+}
 .cardItemProperties{
   font-size: 14px;
   font-weight: 400;
-  color: black;
+  color: white;
+  width: auto ;
   height: auto;
+  margin-left: 15px;
   padding: 4px 0px 2px 16px;
+  background-color: rgb(38, 44, 77);
 }
 .cardModifiedItemLabel{
   display: block;

@@ -17,4 +17,11 @@ export interface IProject{
     Budget?: string;
     Time?: string;
     Resources?: string;
+    Faser?: Faser;
+    FaserId?: number;
+}
+
+export interface Faser{
+    ID?: number;
+    Title?: string;
 }

@@ -54,6 +54,26 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
     const [responsibleManager, setResponsibleManager] = useState([]);
     const [projectMembers, setprojectMembers] = useState([]);
     
+    useEffect(() => {
+        const fetchData = async (): Promise<any> => {
+            try {
+                const items = await sp.web.lists.getByTitle("ProjektTyp").items();
+                const dropdownOptions = items.map((option: any) => ({
+                    key: option.Id,
+                    text: option.Title
+                }));
+                setDropdownOptions(dropdownOptions);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+        };
+
+        fetchData().catch((err) => {
+            console.error(err);
+        });
+    }, []); 
+    
     const _getProjectManager = (props: IUser[]): void => {  setProjectManager(props);}
     const _getResponsibleManager = (props: IUser[]): void => {  setResponsibleManager(props);}
     const _getProjectMembers = (props: IUser[]): void => {  setprojectMembers(props);}
@@ -69,6 +89,7 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
     }
 
     const onSaveProject = async (): Promise<any>  => {
+        
         const projectManagerUser = projectManager.map((items: IUser) =>{return items.id})[0];
         const responsibleManagerUser = responsibleManager.map((items: IUser) =>{return items.id})[0];
         const projectMembersUser: number[] = [];
@@ -102,25 +123,7 @@ const NewProject: React.FC<INewProjectProps> = (props) =>{
             }
            
     }
-    useEffect(() => {
-        const fetchData = async (): Promise<any> => {
-            try {
-                const items = await sp.web.lists.getByTitle("ProjektTyp").items();
-                const dropdownOptions = items.map((option: any) => ({
-                    key: option.Id,
-                    text: option.Title
-                }));
-                setDropdownOptions(dropdownOptions);
-                }
-                catch (error) {
-                    console.error(error);
-                }
-        };
 
-        fetchData().catch((err) => {
-            console.error(err);
-        });
-    }, []); 
 
     return (
     <React.Fragment>

@@ -10,14 +10,8 @@
   }
 }
 .NavigationWrapper{
-  @include ms-Grid-col;
-  @include ms-lg12;
-  @include ms-xl12;
-  @include ms-sm12;
-  @include ms-xlPush2;
-  @include ms-lgPush1;
-  background-color: none;
-  position: static;
+  background-size: cover;
+  background-position: center;
 }
 .welcome {
   text-align: center;

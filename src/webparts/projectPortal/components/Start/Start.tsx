@@ -31,7 +31,7 @@ const Start : React.FC<IStartProps> = (props: IStartProps) =>{
         </div>
         <div className={styles.projectActivityWrapper}>
         <div className={styles.myProjectsColumn}>
-            <MyProject {...props} />
+        <MyProject {...props} />
         </div>
         <div className={styles.myActivitiesColumn}>
         <Activities {...props} />
